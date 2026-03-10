@@ -4,8 +4,14 @@ import { requireAdmin } from "@/lib/auth-server";
 import { uploadImage, deleteImage } from "@/lib/cloudinary";
 import { ObjectId } from "mongodb";
 
-function extractYouTubeId(url: string) {
-  const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+function extractYouTubeId(url: string): string | null {
+  // Handles all formats:
+  // - youtube.com/watch?v=ID
+  // - youtube.com/shorts/ID
+  // - youtu.be/ID
+  // - youtube.com/embed/ID
+  // - youtube.com/v/ID
+  const regExp = /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i;
   const match = url.match(regExp);
   return match ? match[1] : null;
 }
