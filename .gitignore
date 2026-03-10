@@ -40,3 +40,6 @@ next-env.d.ts
 
 # Internal docs/specs (keep local only)
 project-spec/
+
+history_restore.txt
+tsconfig.tsbuildinfo

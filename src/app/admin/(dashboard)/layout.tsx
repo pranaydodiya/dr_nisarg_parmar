@@ -36,6 +36,18 @@ export default async function AdminDashboardLayout({
             >
               Testimonials
             </Link>
+            <Link
+              href="/admin/locations"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Locations
+            </Link>
+            <Link
+              href="/admin/contact-settings"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Contact
+            </Link>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">
