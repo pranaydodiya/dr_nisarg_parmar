@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { MOCK_BLOG_POSTS, MOCK_BLOG_POST_BODIES } from "@/content/mock-data";
+import { getDbAsync } from "@/lib/db/mongodb";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -15,13 +15,13 @@ function formatDate(dateStr: string) {
   });
 }
 
-export async function generateStaticParams() {
-  return MOCK_BLOG_POSTS.map((post) => ({ slug: post.slug }));
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = MOCK_BLOG_POSTS.find((p) => p.slug === slug);
+  const db = await getDbAsync();
+  const post = await db
+    .collection("blogs")
+    .findOne({ slug, isPublished: true });
+
   if (!post) return { title: "Post not found" };
   return {
     title: `${post.title} | Dr. Nisarg Parmar Blog`,
@@ -31,10 +31,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = MOCK_BLOG_POSTS.find((p) => p.slug === slug);
+
+  const db = await getDbAsync();
+  const post = await db
+    .collection("blogs")
+    .findOne({ slug, isPublished: true });
+
   if (!post) notFound();
 
-  const body = MOCK_BLOG_POST_BODIES[post.slug] ?? "<p>Content coming soon.</p>";
+  const body = post.content ?? "<p>Content coming soon.</p>";
 
   return (
     <article className="py-16 md:py-24 pb-20">
@@ -47,22 +52,24 @@ export default async function BlogPostPage({ params }: Props) {
         </Link>
         <header className="mb-8">
           <p className="text-sm text-muted-foreground mb-2">
-            {post.category} • {formatDate(post.publishDate)}
+            {post.category} • {formatDate(post.createdAt)}
           </p>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground">
             {post.title}
           </h1>
         </header>
-        <div className="relative aspect-video rounded-xl overflow-hidden bg-muted mb-8">
-          <Image
-            src={post.featuredImage}
-            alt=""
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 896px"
-            priority
-          />
-        </div>
+        {post.featuredImage && (
+          <div className="relative aspect-video rounded-xl overflow-hidden bg-muted mb-8">
+            <Image
+              src={post.featuredImage}
+              alt={post.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 896px"
+              priority
+            />
+          </div>
+        )}
         <div
           className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-semibold prose-p:text-muted-foreground prose-p:leading-relaxed"
           dangerouslySetInnerHTML={{ __html: body }}
@@ -71,7 +78,12 @@ export default async function BlogPostPage({ params }: Props) {
           <Button variant="outline" size="sm" className="rounded-full" asChild>
             <Link href="/blog">All posts</Link>
           </Button>
-          <Button variant="secondary" size="sm" className="rounded-full ml-3" asChild>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="rounded-full ml-3"
+            asChild
+          >
             <Link href="/appointments">Book Appointment</Link>
           </Button>
         </div>

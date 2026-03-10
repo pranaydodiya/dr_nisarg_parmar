@@ -20,9 +20,23 @@ export default async function AdminDashboardLayout({
     <div className="min-h-screen bg-muted/30">
       <header className="border-b border-border bg-background px-4 py-3">
         <div className="container mx-auto flex items-center justify-between">
-          <Link href="/admin" className="font-semibold text-foreground">
-            Admin
-          </Link>
+          <div className="flex items-center gap-6">
+            <Link href="/admin" className="font-semibold text-foreground">
+              Dashboard
+            </Link>
+            <Link
+              href="/admin/blogs"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Blogs
+            </Link>
+            <Link
+              href="/admin/testimonials"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Testimonials
+            </Link>
+          </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">
               {session.user.email}

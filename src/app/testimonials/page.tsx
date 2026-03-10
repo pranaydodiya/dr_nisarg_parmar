@@ -5,10 +5,12 @@ import { SectionReveal } from "@/components/shared/SectionReveal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Play, Youtube } from "lucide-react";
 import { TestimonialsColumn } from "@/components/ui/testimonials-columns-1";
+import { getDbAsync } from "@/lib/db/mongodb";
 
 export const metadata: Metadata = {
   title: "Patient Testimonials | Dr. Nisarg Parmar",
-  description: "What patients say about Dr. Nisarg Parmar. Written and video testimonials from neuro and spine surgery patients.",
+  description:
+    "What patients say about Dr. Nisarg Parmar. Written and video testimonials from neuro and spine surgery patients.",
 };
 
 // Mock written testimonials
@@ -235,32 +237,14 @@ const WRITTEN = [
   },
 ];
 
-// Mock video testimonials: YouTube + Instagram (placeholder thumbnails; click opens link)
-const VIDEO_MOCK = [
-  {
-    patientName: "Karan Joshi",
-    condition: "Lumbar spine surgery • Mar 2026",
-    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    thumbnailUrl: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-    type: "youtube" as const,
-  },
-  {
-    patientName: "Meera Singh",
-    condition: "Brain tumor surgery • Feb 2026",
-    instagramReelUrl: "https://www.instagram.com/reel/example/",
-    thumbnailUrl: undefined,
-    type: "instagram" as const,
-  },
-  {
-    patientName: "Vikram Patel",
-    condition: "Cervical spine decompression • Nov 2025",
-    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    thumbnailUrl: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
-    type: "youtube" as const,
-  },
-];
+export default async function TestimonialsPage() {
+  const db = await getDbAsync();
+  const videos = await db
+    .collection("testimonials")
+    .find({ isPublished: true })
+    .sort({ createdAt: -1 })
+    .toArray();
 
-export default function TestimonialsPage() {
   return (
     <div className="bg-[#FAFAF8] text-slate-900 pb-16">
       {/* Hero / intro */}
@@ -276,6 +260,86 @@ export default function TestimonialsPage() {
         </div>
       </section>
 
+      {/* Video testimonials */}
+      {videos.length > 0 && (
+        <section id="video" className="pb-12 md:pb-16">
+          <div className="container mx-auto px-4">
+            <SectionReveal>
+              <h2 className="text-lg font-semibold tracking-tight text-slate-900 mb-4 md:text-xl">
+                Video testimonials
+              </h2>
+              <p className="mb-8 max-w-2xl text-sm leading-relaxed text-slate-600">
+                Some patients and families chose to share their journey on
+                video. Click a thumbnail to watch their story on YouTube or
+                Instagram.
+              </p>
+            </SectionReveal>
+            <SectionReveal delay={0.05}>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {videos.map((item) => {
+                  return (
+                    <a
+                      key={item._id.toString()}
+                      href={item.videoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group block overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-sm transition-transform duration-200 hover:-translate-y-1 hover:shadow-md focus-visible:ring-2 ring-secondary"
+                    >
+                      <div className="relative aspect-video bg-muted">
+                        {item.thumbnailUrl ? (
+                          <img
+                            src={item.thumbnailUrl}
+                            alt={`Video testimonial from ${item.patientName}`}
+                            className="h-full w-full object-cover transition-opacity duration-200 group-hover:opacity-90"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
+                            <span className="text-sm">
+                              {item.platform === "instagram"
+                                ? "Instagram Reel"
+                                : "Video testimonial"}
+                            </span>
+                          </div>
+                        )}
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/40">
+                          <div className="flex h-12 w-16 items-center justify-center rounded-xl bg-[#FF0000] shadow-lg transition-transform group-hover:scale-110">
+                            <Play
+                              className="h-6 w-6 fill-white text-white"
+                              aria-hidden
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-card p-4">
+                        <p className="font-medium text-slate-900">
+                          {item.patientName}
+                        </p>
+                        {item.condition && (
+                          <p className="text-sm font-medium text-slate-600 mb-2">
+                            {item.condition}
+                          </p>
+                        )}
+                        {item.summary && (
+                          <p className="mt-1 mb-3 text-sm text-slate-500 italic line-clamp-3">
+                            "{item.summary}"
+                          </p>
+                        )}
+                        <p className="mt-1 text-xs text-secondary font-medium flex items-center gap-1.5 uppercase tracking-widest">
+                          Watch on{" "}
+                          {item.platform === "youtube"
+                            ? "YouTube →"
+                            : "Instagram →"}
+                        </p>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </SectionReveal>
+          </div>
+        </section>
+      )}
+
       {/* Written testimonials - animated columns */}
       <section className="pb-12 md:pb-16">
         <div className="container mx-auto px-4">
@@ -284,9 +348,10 @@ export default function TestimonialsPage() {
               Written stories
             </h2>
             <p className="mb-8 max-w-2xl text-sm leading-relaxed text-slate-600">
-              Every surgery and consultation is a personal story. These written testimonials
-              highlight what patients valued most&mdash;clear communication, calm guidance,
-              and careful follow-up before and after surgery.
+              Every surgery and consultation is a personal story. These written
+              testimonials highlight what patients valued most&mdash;clear
+              communication, calm guidance, and careful follow-up before and
+              after surgery.
             </p>
           </SectionReveal>
           <SectionReveal delay={0.05}>
@@ -312,7 +377,10 @@ export default function TestimonialsPage() {
 
               return (
                 <div className="mt-6 flex justify-center gap-6 [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_80%,transparent)] max-h-[620px] overflow-hidden">
-                  <TestimonialsColumn testimonials={firstColumn} duration={18} />
+                  <TestimonialsColumn
+                    testimonials={firstColumn}
+                    duration={18}
+                  />
                   <TestimonialsColumn
                     testimonials={secondColumn}
                     duration={22}
@@ -330,78 +398,6 @@ export default function TestimonialsPage() {
         </div>
       </section>
 
-      {/* Video testimonials */}
-      <section id="video" className="pb-12 md:pb-16">
-        <div className="container mx-auto px-4">
-          <SectionReveal>
-            <h2 className="text-lg font-semibold tracking-tight text-slate-900 mb-4 md:text-xl">
-              Video testimonials
-            </h2>
-            <p className="mb-8 max-w-2xl text-sm leading-relaxed text-slate-600">
-              Some patients and families chose to share their journey on video. Click a
-              thumbnail to watch their story on YouTube or Instagram.
-            </p>
-          </SectionReveal>
-          <SectionReveal delay={0.05}>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {VIDEO_MOCK.map((item, index) => {
-                const href =
-                  item.type === "youtube" ? item.videoUrl : item.instagramReelUrl!;
-                return (
-                  <a
-                    key={index}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group block overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-sm transition-transform duration-200 hover:-translate-y-1 hover:shadow-md focus-visible:ring-2 ring-secondary"
-                  >
-                    <div className="relative aspect-video bg-muted">
-                      {item.thumbnailUrl ? (
-                        <img
-                          src={item.thumbnailUrl}
-                          alt={`Video testimonial from ${item.patientName}`}
-                          className="h-full w-full object-cover transition-opacity duration-200 group-hover:opacity-90"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
-                          <span className="text-sm">
-                            {item.type === "instagram" ? "Instagram Reel" : "Video testimonial"}
-                          </span>
-                        </div>
-                      )}
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/45">
-                        {item.type === "youtube" ? (
-                          <Youtube
-                            className="h-12 w-12 text-white drop-shadow"
-                            aria-hidden
-                          />
-                        ) : (
-                          <Play
-                            className="h-12 w-12 text-white fill-white drop-shadow"
-                            aria-hidden
-                          />
-                        )}
-                      </div>
-                    </div>
-                    <div className="bg-card p-4">
-                      <p className="font-medium text-slate-900">
-                        {item.patientName}
-                      </p>
-                      {item.condition && (
-                        <p className="text-sm text-slate-600">{item.condition}</p>
-                      )}
-                      <p className="mt-1 text-xs text-slate-500">
-                        Opens on {item.type === "youtube" ? "YouTube" : "Instagram"}
-                      </p>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
-          </SectionReveal>
-        </div>
-      </section>
-
       {/* CTA card */}
       <section className="pb-12 md:pb-16">
         <div className="container mx-auto px-4">
@@ -414,9 +410,9 @@ export default function TestimonialsPage() {
                 Need an opinion or follow-up?
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-slate-700 md:text-base">
-                If you or a family member has been advised brain or spine surgery, or if
-                you&apos;re recovering and need a review, you can book a consultation to
-                discuss your reports and next steps.
+                If you or a family member has been advised brain or spine
+                surgery, or if you&apos;re recovering and need a review, you can
+                book a consultation to discuss your reports and next steps.
               </p>
               <div className="mt-8 flex justify-center">
                 <Link

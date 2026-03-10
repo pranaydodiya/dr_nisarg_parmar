@@ -3,11 +3,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { Card, CardContent } from "@/components/ui/card";
-import { MOCK_BLOG_POSTS } from "@/content/mock-data";
+import { getDbAsync } from "@/lib/db/mongodb";
 
 export const metadata: Metadata = {
   title: "Blog | Dr. Nisarg Parmar - Neurosurgeon",
-  description: "Articles on brain and spine care, neurosurgery, and patient information from Dr. Nisarg Parmar.",
+  description:
+    "Articles on brain and spine care, neurosurgery, and patient information from Dr. Nisarg Parmar.",
 };
 
 function formatDate(dateStr: string) {
@@ -18,7 +19,15 @@ function formatDate(dateStr: string) {
   });
 }
 
-export default function BlogListPage() {
+export default async function BlogListPage() {
+  const db = await getDbAsync();
+  const blogsCollection = db.collection("blogs");
+  // Only show published blogs on the public site
+  const blogs = await blogsCollection
+    .find({ isPublished: true })
+    .sort({ createdAt: -1 })
+    .toArray();
+
   return (
     <div className="pt-10 pb-20 md:pt-16 md:pb-24">
       <div className="container mx-auto px-4">
@@ -28,7 +37,7 @@ export default function BlogListPage() {
           className="mb-12"
         />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {MOCK_BLOG_POSTS.map((post) => (
+          {blogs.map((post) => (
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
@@ -36,17 +45,19 @@ export default function BlogListPage() {
             >
               <Card className="border-border rounded-xl overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
                 <div className="relative aspect-video bg-muted">
-                  <Image
-                    src={post.featuredImage}
-                    alt=""
-                    fill
-                    className="object-cover group-hover:opacity-95 transition-opacity"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
+                  {post.featuredImage && (
+                    <Image
+                      src={post.featuredImage}
+                      alt={post.title}
+                      fill
+                      className="object-cover group-hover:opacity-95 transition-opacity pt-0"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  )}
                 </div>
                 <CardContent className="pt-5 pb-5 flex-1 flex flex-col">
                   <p className="text-xs text-muted-foreground mb-1">
-                    {post.category} • {formatDate(post.publishDate)}
+                    {post.category} • {formatDate(post.createdAt)}
                   </p>
                   <h2 className="text-lg font-semibold text-foreground group-hover:text-secondary transition-colors mb-2">
                     {post.title}
