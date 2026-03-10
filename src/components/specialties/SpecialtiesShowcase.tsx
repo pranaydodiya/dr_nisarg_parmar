@@ -40,8 +40,7 @@ const PROGRAMS: Program[] = [
     subtitle: "Advanced brain tumor care",
     description:
       "Advanced surgical treatment for brain tumors with precision and care, from diagnosis to recovery.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=80",
+    imageUrl: "/images/specialties/brain_tumor_1773115872282.png",
     stats: [
       { label: "Brain tumor surgeries", value: "2000+" },
       { label: "Years of experience", value: "8+ yrs" },
@@ -54,8 +53,7 @@ const PROGRAMS: Program[] = [
     subtitle: "Disc, deformity & trauma",
     description:
       "Comprehensive spine solutions for disc, deformity, and trauma cases, focused on stability and mobility.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1519824145371-296894a0daa9?auto=format&fit=crop&w=1400&q=80",
+    imageUrl: "/images/specialties/spine_surgery_1773115892132.png",
     stats: [
       { label: "Spine surgeries", value: "2,000+" },
       { label: "Minimally invasive cases", value: "60%" },
@@ -68,8 +66,7 @@ const PROGRAMS: Program[] = [
     subtitle: "Head & spine emergencies",
     description:
       "Emergency neurosurgical care for head and spine injuries with 24/7 availability.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1582719478250-cc99d3d44da1?auto=format&fit=crop&w=1400&q=80",
+    imageUrl: "/images/specialties/neurotrauma_1773115905596.png",
     stats: [
       { label: "Emergency cases handled", value: "3,000+" },
       { label: "Hospitals on call", value: "5+" },
@@ -82,8 +79,7 @@ const PROGRAMS: Program[] = [
     subtitle: "Child-focused brain & spine",
     description:
       "Specialized care for children with neurological conditions, tailored to growth and development.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1584466977773-e625c37cdd50?auto=format&fit=crop&w=1400&q=80",
+    imageUrl: "/images/specialties/pediatric_neuro_1773115930365.png",
     stats: [
       { label: "Pediatric cases", value: "800+" },
       { label: "Age range", value: "Newborn–18" },
@@ -96,8 +92,7 @@ const PROGRAMS: Program[] = [
     subtitle: "Aneurysms & AVMs",
     description:
       "Treatment of aneurysms, AVMs, and other vascular brain conditions.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1581591524425-c7e0978865fc?auto=format&fit=crop&w=1400&q=80",
+    imageUrl: "/images/specialties/vascular_neuro_1773115947748.png",
     stats: [
       { label: "Vascular procedures", value: "1,000+" },
       { label: "Stroke interventions", value: "24/7" },
@@ -110,8 +105,7 @@ const PROGRAMS: Program[] = [
     subtitle: "Smaller cuts, faster recovery",
     description:
       "Advanced minimally invasive techniques that aim for faster recovery and minimal scarring.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1519499232689-9061329f5b35?auto=format&fit=crop&w=1400&q=80",
+    imageUrl: "/images/specialties/minimally_invasive_1773115964253.png",
     stats: [
       { label: "Keyhole / endoscopic cases", value: "800+" },
       { label: "Typical hospital stay", value: "2–4 days" },
@@ -172,7 +166,7 @@ function ProgramCard({
       className={cn(
         "relative mx-auto w-full max-w-6xl rounded-[32px] border border-slate-200/80 bg-white/80 cursor-pointer",
         "shadow-[0_24px_80px_rgba(15,23,42,0.18)] backdrop-blur-md",
-        "overflow-hidden"
+        "overflow-hidden",
       )}
       onClick={onOpen}
       role="button"
@@ -323,9 +317,9 @@ export function SpecialtiesShowcase() {
               Ready to discuss your brain or spine concern?
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-700 md:text-base">
-              Schedule a consultation. We&apos;ll review your reports, answer your
-              questions, and help you plan the next step. Appointment requests are
-              confirmed within a few hours.
+              Schedule a consultation. We&apos;ll review your reports, answer
+              your questions, and help you plan the next step. Appointment
+              requests are confirmed within a few hours.
             </p>
 
             <div className="mt-8 flex justify-center">
@@ -421,4 +415,3 @@ export function SpecialtiesShowcase() {
     </main>
   );
 }
-
