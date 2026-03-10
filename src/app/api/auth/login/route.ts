@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     const db = getDb();
     const user = await db.collection("users").findOne({
-      email: email.toLowerCase(),
+      email: String(email).toLowerCase(),
       role: "admin",
     });
 

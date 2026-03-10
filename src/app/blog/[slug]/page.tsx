@@ -4,6 +4,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { getDbAsync } from "@/lib/db/mongodb";
+import { sanitizeRichHtml } from "@/lib/sanitize";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -15,8 +16,11 @@ function formatDate(dateStr: string) {
   });
 }
 
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  if (typeof slug !== "string" || !SLUG_RE.test(slug)) return { title: "Post not found" };
   const db = await getDbAsync();
   const post = await db
     .collection("blogs")
@@ -31,6 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
+  if (typeof slug !== "string" || !SLUG_RE.test(slug)) notFound();
 
   const db = await getDbAsync();
   const post = await db
@@ -39,7 +44,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   if (!post) notFound();
 
-  const body = post.content ?? "<p>Content coming soon.</p>";
+  const body = sanitizeRichHtml(post.content ?? "<p>Content coming soon.</p>");
 
   return (
     <article className="py-16 md:py-24 pb-20">

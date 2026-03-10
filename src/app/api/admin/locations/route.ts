@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db/mongodb";
 import { requireAdmin } from "@/lib/auth-server";
+import { sanitizeGmapEmbed, stripHtml } from "@/lib/sanitize";
 
 /**
  * GET /api/admin/locations — list all locations, sorted by order
@@ -68,18 +69,18 @@ export async function POST(req: NextRequest) {
     const nextOrder = maxOrderDoc.length > 0 ? (maxOrderDoc[0].order || 0) + 1 : 0;
 
     const newLocation = {
-      name: name || "",
-      address: address || "",
-      city: city || "",
-      phone: phone || "",
-      email: email || "",
-      gmapEmbedCode: gmapEmbedCode || "",
-      gmapLink: gmapLink || "",
+      name: stripHtml(name || ""),
+      address: stripHtml(address || ""),
+      city: stripHtml(city || ""),
+      phone: stripHtml(phone || ""),
+      email: stripHtml(email || ""),
+      gmapEmbedCode: sanitizeGmapEmbed(gmapEmbedCode || ""),
+      gmapLink: stripHtml(gmapLink || ""),
       latitude: latitude ? parseFloat(latitude) : null,
       longitude: longitude ? parseFloat(longitude) : null,
       isPrimary: isPrimary === true,
       isAvailableAt: isAvailableAt === true,
-      operatingHours: operatingHours || "",
+      operatingHours: stripHtml(operatingHours || ""),
       isActive: isActive !== false, // default true
       order: nextOrder,
       createdAt: new Date(),

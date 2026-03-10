@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db/mongodb";
 import { hashSync } from "bcryptjs";
+import { timingSafeEqual } from "crypto";
 
 const DEFAULT_EMAIL = "admin@example.com";
 const DEFAULT_NAME = "Admin";
@@ -20,7 +21,11 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-  if (secret !== expected) {
+  if (
+    !secret ||
+    secret.length !== expected.length ||
+    !timingSafeEqual(Buffer.from(secret), Buffer.from(expected))
+  ) {
     return NextResponse.json({ error: "Invalid or missing secret" }, { status: 401 });
   }
 

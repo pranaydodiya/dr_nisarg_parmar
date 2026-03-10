@@ -76,7 +76,7 @@ export async function VideoTestimonialsSection() {
                     )}
                     {item.summary && (
                       <p className="mt-1 mb-3 text-sm text-slate-500 italic line-clamp-2">
-                        "{item.summary}"
+                        &ldquo;{item.summary}&rdquo;
                       </p>
                     )}
                     <p className="mt-1 text-xs text-secondary font-medium flex items-center gap-1.5 uppercase tracking-widest">

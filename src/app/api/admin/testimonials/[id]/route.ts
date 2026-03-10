@@ -16,11 +16,11 @@ function extractYouTubeId(url: string): string | null {
   return match ? match[1] : null;
 }
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin();
 
-    const { id } = params;
+    const { id } = await params;
     if (!ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
@@ -39,11 +39,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin();
 
-    const { id } = params;
+    const { id } = await params;
     if (!ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
@@ -129,11 +129,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin();
 
-    const { id } = params;
+    const { id } = await params;
     if (!ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }

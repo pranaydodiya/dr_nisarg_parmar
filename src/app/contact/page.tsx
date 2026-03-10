@@ -12,6 +12,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { getDbAsync } from "@/lib/db/mongodb";
+import { safeJsonLd, sanitizeGmapEmbed } from "@/lib/sanitize";
 
 export const metadata: Metadata = {
   title: "Contact & Locations | Dr. Nisarg Parmar",
@@ -169,7 +170,7 @@ export default async function ContactPage() {
                     <div
                       className="w-full bg-muted"
                       dangerouslySetInnerHTML={{
-                        __html: loc.gmapEmbedCode
+                        __html: sanitizeGmapEmbed(loc.gmapEmbedCode)
                           .replace(/width="[^"]*"/g, 'width="100%"')
                           .replace(/height="[^"]*"/g, 'height="180"'),
                       }}
@@ -365,7 +366,7 @@ export default async function ContactPage() {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(
+            __html: safeJsonLd(
               mainLocations.map((loc: any) => ({
                 "@context": "https://schema.org",
                 "@type": "MedicalClinic",

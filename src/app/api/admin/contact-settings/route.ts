@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db/mongodb";
 import { requireAdmin } from "@/lib/auth-server";
+import { stripHtml } from "@/lib/sanitize";
 
 const SETTINGS_KEY = "contact_settings";
 
@@ -68,16 +69,16 @@ export async function PUT(req: NextRequest) {
 
     const updateDoc = {
       key: SETTINGS_KEY,
-      emergencyPhone: emergencyPhone || "",
-      emergencyPhoneTel: emergencyPhoneTel || "",
-      primaryPhone: primaryPhone || "",
-      primaryPhoneTel: primaryPhoneTel || "",
-      email: email || "",
-      emergencyMessage: emergencyMessage || "",
-      emergencyTitle: emergencyTitle || "24/7 Emergency Neurosurgery",
+      emergencyPhone: stripHtml(emergencyPhone || ""),
+      emergencyPhoneTel: stripHtml(emergencyPhoneTel || ""),
+      primaryPhone: stripHtml(primaryPhone || ""),
+      primaryPhoneTel: stripHtml(primaryPhoneTel || ""),
+      email: stripHtml(email || ""),
+      emergencyMessage: stripHtml(emergencyMessage || ""),
+      emergencyTitle: stripHtml(emergencyTitle || "24/7 Emergency Neurosurgery"),
       showEmergencyStrip: showEmergencyStrip !== false,
-      whatsappNumber: whatsappNumber || "",
-      whatsappMessage: whatsappMessage || "",
+      whatsappNumber: stripHtml(whatsappNumber || ""),
+      whatsappMessage: stripHtml(whatsappMessage || ""),
       showWhatsapp: showWhatsapp === true,
       updatedAt: new Date(),
     };

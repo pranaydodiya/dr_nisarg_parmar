@@ -2,15 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db/mongodb";
 import { requireAdmin } from "@/lib/auth-server";
 import { ObjectId } from "mongodb";
+import { sanitizeGmapEmbed, stripHtml } from "@/lib/sanitize";
 
 /**
  * GET /api/admin/locations/[id] — get single location
  */
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin();
 
-    const { id } = params;
+    const { id } = await params;
     if (!ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
@@ -32,11 +33,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 /**
  * PUT /api/admin/locations/[id] — update a location
  */
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin();
 
-    const { id } = params;
+    const { id } = await params;
     if (!ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
@@ -84,18 +85,18 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
     const updateDoc = {
       $set: {
-        name: name || "",
-        address: address || "",
-        city: city || "",
-        phone: phone || "",
-        email: email || "",
-        gmapEmbedCode: gmapEmbedCode || "",
-        gmapLink: gmapLink || "",
+        name: stripHtml(name || ""),
+        address: stripHtml(address || ""),
+        city: stripHtml(city || ""),
+        phone: stripHtml(phone || ""),
+        email: stripHtml(email || ""),
+        gmapEmbedCode: sanitizeGmapEmbed(gmapEmbedCode || ""),
+        gmapLink: stripHtml(gmapLink || ""),
         latitude: latitude ? parseFloat(latitude) : null,
         longitude: longitude ? parseFloat(longitude) : null,
         isPrimary: isPrimary === true,
         isAvailableAt: isAvailableAt === true,
-        operatingHours: operatingHours || "",
+        operatingHours: stripHtml(operatingHours || ""),
         isActive: isActive !== false,
         updatedAt: new Date(),
       },
@@ -115,11 +116,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 /**
  * DELETE /api/admin/locations/[id] — delete a location
  */
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin();
 
-    const { id } = params;
+    const { id } = await params;
     if (!ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }

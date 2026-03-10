@@ -21,6 +21,16 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    // Validate every ID before processing
+    for (const id of orderedIds) {
+      if (typeof id !== "string" || !ObjectId.isValid(id)) {
+        return NextResponse.json(
+          { error: "Invalid location ID in orderedIds" },
+          { status: 400 },
+        );
+      }
+    }
+
     const db = getDb();
     const locationsCollection = db.collection("locations");
 
