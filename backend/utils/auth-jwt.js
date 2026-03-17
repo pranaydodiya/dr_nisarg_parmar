@@ -32,10 +32,11 @@ export async function verifyToken(token) {
 }
 
 export function getCookieOptions() {
+  const isProduction = process.env.NODE_ENV === "production";
   return {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax", // "none" needed for cross-domain cookies
     maxAge: COOKIE_MAX_AGE * 1000, // maxAge in res.cookie is in milliseconds
     path: "/",
   };
