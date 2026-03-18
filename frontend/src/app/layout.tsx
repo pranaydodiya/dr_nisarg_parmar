@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "@/app/globals.css";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ClientLayout } from "@/components/layout/ClientLayout";
+import { FloatingWidgets } from "@/components/shared/FloatingWidgets";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,9 +31,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="en" className={`${inter.variable} ${playfair.variable}`} data-scroll-behavior="smooth">
       <body className="min-h-screen flex flex-col font-sans">
         <ScrollToTop />
+        <FloatingWidgets />
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
