@@ -65,14 +65,7 @@ export async function session(req, res) {
 // Helper getter just for session checks
 export async function getSession(req, res) {
   try {
-    const cookieHeader = req.headers.cookie;
-    let token = null;
-    
-    if (cookieHeader) {
-      const cookies = cookieHeader.split(';').map(c => c.trim().split('='));
-      const adminCookie = cookies.find(c => c[0] === COOKIE_NAME);
-      if (adminCookie) token = adminCookie[1];
-    }
+    const token = req.cookies?.[COOKIE_NAME];
 
     if (!token) return res.status(401).json({ user: null });
 

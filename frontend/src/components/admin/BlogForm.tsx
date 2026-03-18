@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { NEXT_PUBLIC_API_URL } from "@/lib/api-client";
 
 interface BlogFormProps {
   initialData?: any;
@@ -62,12 +63,13 @@ export function BlogForm({ initialData }: BlogFormProps) {
       if (removeImage) formData.append("removeImage", "true");
 
       const url = initialData
-        ? `/api/admin/blogs/${initialData._id}`
-        : "/api/admin/blogs";
+        ? `${NEXT_PUBLIC_API_URL}/admin/blogs/${initialData._id}`
+        : `${NEXT_PUBLIC_API_URL}/admin/blogs`;
       const method = initialData ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
+        credentials: "include",
         body: formData,
       });
 

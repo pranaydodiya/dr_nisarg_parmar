@@ -20,7 +20,7 @@ const POINTS = [
     color: "bg-teal-500/10 text-teal-600",
   },
   {
-    title: "5000+ Surgeries",
+    title: "2000+ Surgeries",
     desc: "Proven track record with successful brain and spine procedures.",
     icon: Brain,
     color: "bg-purple-500/10 text-purple-600",
@@ -83,8 +83,8 @@ export function WhyChoose() {
                 hoveredIndex === null
                   ? "hover:shadow-xl hover:-translate-y-1"
                   : hoveredIndex === i
-                  ? "shadow-2xl scale-105 -translate-y-2 z-10 border-secondary/30"
-                  : "scale-[0.96] opacity-50 grayscale"
+                    ? "shadow-2xl scale-105 -translate-y-2 z-10 border-secondary/30"
+                    : "scale-[0.96] opacity-50 grayscale",
               )}
             >
               <div
@@ -95,7 +95,7 @@ export function WhyChoose() {
                 <div
                   className={cn(
                     "h-12 w-12 rounded-xl flex items-center justify-center mb-4",
-                    color
+                    color,
                   )}
                 >
                   <Icon className="h-6 w-6" aria-hidden="true" />
@@ -124,25 +124,25 @@ export function WhyChoose() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true, margin: "-20px" }}
                 transition={{ duration: 0.35, ease: "easeOut" }}
-                className="rounded-2xl bg-card border border-border p-5 shadow-lg mb-3"
+                className="rounded-2xl bg-card border border-border p-6 shadow-lg mb-4"
                 style={{
                   transform: `rotate(${i % 2 === 0 ? -0.4 : 0.4}deg)`,
                 }}
               >
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-5">
                   <div
                     className={cn(
-                      "h-11 w-11 rounded-xl flex items-center justify-center shrink-0",
-                      color
+                      "h-12 w-12 rounded-xl flex items-center justify-center shrink-0",
+                      color,
                     )}
                   >
-                    <Icon className="h-5 w-5" aria-hidden="true" />
+                    <Icon className="h-6 w-6" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-foreground mb-1">
+                    <h3 className="text-base font-semibold text-foreground mb-1.5">
                       {title}
                     </h3>
-                    <p className="text-xs text-foreground/60 leading-relaxed">
+                    <p className="text-sm text-foreground/60 leading-relaxed">
                       {desc}
                     </p>
                   </div>
