@@ -64,7 +64,7 @@ export function TestimonialsSectionWithMarquee({
   return (
     <section
       id="testimonials"
-      className={cn("bg-background text-foreground py-12 md:py-16", className)}
+      className={cn("bg-background text-foreground py-12 md:py-16 relative z-10", className)}
       aria-labelledby="testimonials-heading"
     >
       <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8 mb-8 text-center">

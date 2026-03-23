@@ -17,3 +17,12 @@ build/
 /project-spec/
 report.txt
 .history/
+frontend/required-skills/
+
+# Debug/test scripts
+frontend/*.mjs
+frontend/api-response.json
+frontend/err.txt
+
+# Claude Code
+.claude/
