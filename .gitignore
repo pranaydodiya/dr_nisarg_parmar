@@ -26,3 +26,6 @@ frontend/err.txt
 
 # Claude Code
 .claude/
+
+# Chatbot ground truth / knowledge base (used for AI testing — not for version control)
+chatbot-knowledge-base.json
