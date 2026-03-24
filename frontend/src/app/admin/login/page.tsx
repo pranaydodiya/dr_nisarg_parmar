@@ -1,5 +1,4 @@
 "use client";
-import { fetchApi } from "@/lib/api-client";
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -16,11 +15,17 @@ function AdminLoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [slowWarning, setSlowWarning] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    setSlowWarning(false);
+
+    // Show a "this may take a moment" hint after 4 seconds (Render cold start)
+    const slowTimer = setTimeout(() => setSlowWarning(true), 4000);
+
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
@@ -37,7 +42,9 @@ function AdminLoginForm() {
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
+      clearTimeout(slowTimer);
       setLoading(false);
+      setSlowWarning(false);
     }
   }
 
@@ -57,6 +64,11 @@ function AdminLoginForm() {
                 {error}
               </div>
             )}
+            {slowWarning && loading && (
+              <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-700">
+                ⏳ Server is waking up… this may take up to 30 seconds on first login. Please wait.
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -69,6 +81,7 @@ function AdminLoginForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="rounded-lg"
                 placeholder="admin@example.com"
+                disabled={loading}
               />
             </div>
             <div className="space-y-2">
@@ -82,6 +95,7 @@ function AdminLoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="rounded-lg"
+                disabled={loading}
               />
             </div>
             <Button
@@ -90,7 +104,17 @@ function AdminLoginForm() {
               className="w-full rounded-full"
               disabled={loading}
             >
-              {loading ? "Signing in…" : "Sign in"}
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                  </svg>
+                  Signing in…
+                </span>
+              ) : (
+                "Sign in"
+              )}
             </Button>
           </form>
           <p className="mt-4 text-center text-sm text-muted-foreground">

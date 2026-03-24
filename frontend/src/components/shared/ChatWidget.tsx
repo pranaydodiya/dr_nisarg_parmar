@@ -260,12 +260,12 @@ export function ChatWidget() {
       ) : (
         <button
           onClick={() => setIsOpen(true)}
-          className="group relative flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-secondary text-white shadow-[0_4px_20px_rgba(30,58,138,0.3)] transition-all hover:scale-110 hover:shadow-[0_4px_25px_rgba(30,58,138,0.5)] active:scale-95"
+          className="group flex items-center gap-2 sm:gap-2.5 rounded-full bg-secondary text-white shadow-[0_4px_20px_rgba(30,58,138,0.3)] transition-all hover:scale-105 hover:shadow-[0_4px_25px_rgba(30,58,138,0.5)] active:scale-95 pl-3 sm:pl-4 pr-3 sm:pr-4 py-2.5 sm:py-3"
           aria-label="Open AI Assistant"
         >
-          <MessageCircle className="h-6 w-6 sm:h-7 sm:w-7" />
-          <span className="absolute left-full ml-3 sm:ml-4 whitespace-nowrap rounded-lg bg-black/80 px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none hidden sm:block">
-            Ask Dr. Parmar AI
+          <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6 shrink-0" />
+          <span className="text-xs sm:text-sm font-semibold whitespace-nowrap">
+            Ask Dr. Nisarg
           </span>
         </button>
       )}
