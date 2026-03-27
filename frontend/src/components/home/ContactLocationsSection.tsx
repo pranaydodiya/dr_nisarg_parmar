@@ -7,6 +7,28 @@ import { SectionHeading } from "@/components/shared/SectionHeading";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Phone, Navigation, Clock } from "lucide-react";
 
+function getGoogleMapsEmbedSrc(embedCode?: string): string | null {
+  if (!embedCode) return null;
+
+  const iframeMatch =
+    embedCode.match(/<iframe[^>]*\ssrc="([^"]+)"[^>]*>/i) ||
+    embedCode.match(/<iframe[^>]*\ssrc='([^']+)'[^>]*>/i);
+  const src = iframeMatch?.[1];
+  if (!src) return null;
+
+  try {
+    const url = new URL(src);
+    const isGoogleMapsHost =
+      url.hostname === "google.com" ||
+      url.hostname === "www.google.com" ||
+      url.hostname.endsWith(".google.com");
+    if (!isGoogleMapsHost || !url.pathname.startsWith("/maps")) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
 export function ContactLocationsSection() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
@@ -93,27 +115,33 @@ export function ContactLocationsSection() {
           <div
             className={`grid grid-cols-1 md:grid-cols-2 ${locations.length >= 3 ? "lg:grid-cols-3" : ""} gap-5`}
           >
-            {locations.map((loc, i) => (
-              <motion.div
-                key={loc._id || loc.name}
-                initial={reduce ? false : { opacity: 0, y: 20 }}
-                animate={inView ? { opacity: 1, y: 0 } : undefined}
-                transition={{ duration: 0.4, delay: 0.1 + i * 0.1 }}
-                className="h-full"
-              >
-                <Card
-                  className={`border-border rounded-2xl flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 h-full overflow-hidden ${loc.isPrimary ? "ring-2 ring-secondary/30 border-secondary/20" : ""}`}
+            {locations.map((loc, i) => {
+              const mapEmbedSrc = getGoogleMapsEmbedSrc(loc.gmapEmbedCode);
+              return (
+                <motion.div
+                  key={loc._id || loc.name}
+                  initial={reduce ? false : { opacity: 0, y: 20 }}
+                  animate={inView ? { opacity: 1, y: 0 } : undefined}
+                  transition={{ duration: 0.4, delay: 0.1 + i * 0.1 }}
+                  className="h-full"
                 >
-                  {loc.gmapEmbedCode && (
-                    <div
-                      className="w-full bg-muted"
-                      dangerouslySetInnerHTML={{
-                        __html: loc.gmapEmbedCode
-                          .replace(/width="[^"]*"/g, 'width="100%"')
-                          .replace(/height="[^"]*"/g, 'height="180"'),
-                      }}
-                    />
-                  )}
+                  <Card
+                    className={`border-border rounded-2xl flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 h-full overflow-hidden ${loc.isPrimary ? "ring-2 ring-secondary/30 border-secondary/20" : ""}`}
+                  >
+                    {mapEmbedSrc && (
+                      <div className="w-full bg-muted">
+                        <iframe
+                          src={mapEmbedSrc}
+                          title={`${loc.name || "Location"} map`}
+                          width="100%"
+                          height="180"
+                          style={{ border: 0 }}
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                          allowFullScreen
+                        />
+                      </div>
+                    )}
                   <CardContent className="pt-5 pb-5 flex-grow flex flex-col">
                     <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 flex items-center gap-2 flex-wrap">
                       {loc.name}
@@ -177,9 +205,10 @@ export function ContactLocationsSection() {
                       )}
                     </div>
                   </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         )}
 
