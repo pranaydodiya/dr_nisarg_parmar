@@ -1,3 +1,4 @@
+
 # drnisargparmar
 
 Dr. Nisarg Parmar — Neurosurgeon | Brain & Spine Specialist. NIMHANS-trained neurosurgeon providing expert neurological care in Gujarat.
@@ -21,3 +22,4 @@ npm run start
 ## Tech stack
 
 Next.js 14 (App Router), TypeScript, Tailwind CSS, Shadcn/UI, Framer Motion.
+Made By pranay dodiya
