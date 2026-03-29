@@ -180,6 +180,7 @@ export function TestimonialForm({ initialData }: TestimonialFormProps) {
           <div className="flex gap-6 items-center">
             {preview && file ? (
               <div className="relative w-40 aspect-video rounded-lg overflow-hidden border border-slate-300">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={preview}
                   alt="Preview"
@@ -190,6 +191,7 @@ export function TestimonialForm({ initialData }: TestimonialFormProps) {
               initialData?.thumbnailUrl &&
               !removeImage ? (
               <div className="relative w-40 aspect-video rounded-lg overflow-hidden border border-slate-300">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={initialData.thumbnailUrl}
                   alt="Preview"

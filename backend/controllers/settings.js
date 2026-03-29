@@ -20,6 +20,10 @@ const defaults = {
 // GET /api/contact-settings - Public
 export async function getContactSettings(req, res) {
   try {
+    res.set(
+      "Cache-Control",
+      "public, s-maxage=120, stale-while-revalidate=600",
+    );
     const db = getDb();
     const settings = await db.collection("settings").findOne({ key: SETTINGS_KEY });
 

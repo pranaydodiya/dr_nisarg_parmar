@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 type Testimonial = {
@@ -44,7 +45,7 @@ export const TestimonialsColumn: React.FC<TestimonialsColumnProps> = ({
               >
                 <div className="text-sm leading-relaxed text-slate-800">{text}</div>
                 <div className="mt-5 flex items-center gap-3">
-                  <img
+                  <Image
                     width={40}
                     height={40}
                     src={image}

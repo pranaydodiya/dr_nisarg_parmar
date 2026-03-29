@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 export function HeroImage() {
   const [error, setError] = useState(false);
@@ -12,10 +13,13 @@ export function HeroImage() {
     );
   }
   return (
-    <img
+    <Image
       src="/dr-nisarg-parmar.png"
       alt="Dr. Nisarg Parmar - Neurosurgeon"
-      className="h-full w-full object-cover"
+      fill
+      className="object-cover"
+      sizes="(max-width: 768px) 100vw, 50vw"
+      priority
       onError={() => setError(true)}
     />
   );

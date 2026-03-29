@@ -2,13 +2,34 @@ import { ObjectId } from "mongodb";
 import { getDb } from "../db.js";
 import { sanitizeGmapEmbed, stripHtml } from "../utils/sanitize.js";
 
+const PUBLIC_LOCATION_FIELDS = {
+  name: 1,
+  address: 1,
+  city: 1,
+  phone: 1,
+  email: 1,
+  gmapEmbedCode: 1,
+  gmapLink: 1,
+  latitude: 1,
+  longitude: 1,
+  isPrimary: 1,
+  isAvailableAt: 1,
+  operatingHours: 1,
+  order: 1,
+  isActive: 1,
+};
+
 // GET /api/locations
 export async function getLocations(req, res) {
   try {
+    res.set(
+      "Cache-Control",
+      "public, s-maxage=120, stale-while-revalidate=600",
+    );
     const db = getDb();
     const locations = await db
       .collection("locations")
-      .find({ isActive: true })
+      .find({ isActive: true }, { projection: PUBLIC_LOCATION_FIELDS })
       .sort({ order: 1 })
       .toArray();
 

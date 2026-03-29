@@ -162,6 +162,7 @@ export function BlogForm({ initialData }: BlogFormProps) {
         </label>
         {preview ? (
           <div className="relative w-full max-w-sm rounded-lg overflow-hidden border border-slate-200">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={preview} alt="Preview" className="w-full h-auto" />
             <button
               type="button"

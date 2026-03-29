@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X, Calendar } from "lucide-react";
@@ -31,10 +32,12 @@ function LogoImage() {
     );
   }
   return (
-    <img
+    <Image
       src="/dr-nisarg-parmar.png"
       alt="Dr. Nisarg Parmar - Neurosurgeon"
-      className="h-full w-full object-cover"
+      fill
+      className="object-cover"
+      sizes="40px"
       onError={() => setError(true)}
     />
   );

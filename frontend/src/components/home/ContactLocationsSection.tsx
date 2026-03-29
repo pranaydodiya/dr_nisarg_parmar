@@ -1,52 +1,38 @@
 "use client";
-import { fetchApi } from "@/lib/api-client";
-import { useRef, useEffect, useState } from "react";
+import { useRef } from "react";
 import Link from "next/link";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Phone, Navigation, Clock } from "lucide-react";
+import type { ContactSettings } from "@/lib/contact-types";
 
-export function ContactLocationsSection() {
+type LocationCard = {
+  _id?: string;
+  name?: string;
+  address?: string;
+  city?: string;
+  phone?: string;
+  gmapEmbedCode?: string;
+  gmapLink?: string;
+  operatingHours?: string;
+  isPrimary?: boolean;
+};
+
+type Props = {
+  initialLocations: LocationCard[];
+  initialSettings: ContactSettings;
+};
+
+export function ContactLocationsSection({
+  initialLocations,
+  initialSettings: settings,
+}: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const reduce = useReducedMotion();
 
-  const [locations, setLocations] = useState<any[]>([]);
-  const [settings, setSettings] = useState<any>({
-    emergencyTitle: "24/7 Emergency Neurosurgery",
-    emergencyMessage:
-      "Head injuries, spinal trauma, stroke — immediate care available.",
-    emergencyPhone: "+91 99741 11089",
-    emergencyPhoneTel: "+919974111089",
-    showEmergencyStrip: true,
-  });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [locRes, setRes] = await Promise.all([
-          fetchApi("/locations"),
-          fetchApi("/contact-settings"),
-        ]);
-        if (locRes.ok) {
-          const locs = await locRes.json();
-          // Filter out secondary locations and show max 6 on homepage
-          setLocations(locs.filter((l: any) => !l.isAvailableAt).slice(0, 6));
-        }
-        if (setRes.ok) {
-          const s = await setRes.json();
-          setSettings(s);
-        }
-      } catch (e) {
-        console.error("Error fetching locations for home:", e);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
+  const locations = initialLocations;
 
   return (
     <section
@@ -85,15 +71,15 @@ export function ContactLocationsSection() {
           </motion.div>
         )}
 
-        {loading ? (
-          <div className="text-center py-10 text-slate-500">
-            Loading locations...
-          </div>
-        ) : (
-          <div
-            className={`grid grid-cols-1 md:grid-cols-2 ${locations.length >= 3 ? "lg:grid-cols-3" : ""} gap-5`}
-          >
-            {locations.map((loc, i) => (
+        <div
+          className={`grid grid-cols-1 md:grid-cols-2 ${locations.length >= 3 ? "lg:grid-cols-3" : ""} gap-5`}
+        >
+          {locations.length === 0 ? (
+            <p className="col-span-full text-center py-10 text-slate-500">
+              Location details will appear here shortly.
+            </p>
+          ) : (
+            locations.map((loc, i) => (
               <motion.div
                 key={loc._id || loc.name}
                 initial={reduce ? false : { opacity: 0, y: 20 }}
@@ -179,9 +165,9 @@ export function ContactLocationsSection() {
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
 
         <motion.div
           initial={reduce ? false : { opacity: 0 }}

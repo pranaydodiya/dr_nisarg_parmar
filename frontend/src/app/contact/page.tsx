@@ -11,7 +11,7 @@ import {
   Navigation,
   ExternalLink,
 } from "lucide-react";
-import { fetchApi } from "@/lib/api-client";
+import { getContactPageData } from "@/lib/contact-data";
 import { safeJsonLd, sanitizeGmapEmbed } from "@/lib/sanitize";
 
 export const metadata: Metadata = {
@@ -20,46 +20,8 @@ export const metadata: Metadata = {
     "Reach out for appointments, inquiries, or emergency consultations. Locations in Surat and Ahmedabad. 24/7 emergency neurosurgery.",
 };
 
-const DEFAULT_SETTINGS = {
-  emergencyPhone: "+91 99741 11089",
-  emergencyPhoneTel: "+919974111089",
-  primaryPhone: "+91 99741 11089",
-  primaryPhoneTel: "+919974111089",
-  email: "contact@drnisargparmar.com",
-  emergencyMessage:
-    "Head injuries, spinal trauma, stroke — immediate care available.",
-  emergencyTitle: "24/7 Emergency Neurosurgery",
-  showEmergencyStrip: true,
-  whatsappNumber: "",
-  whatsappMessage: "",
-  showWhatsapp: false,
-};
-
-async function getContactData() {
-  try {
-    const [settingsRes, locationsRes] = await Promise.all([
-      fetchApi("/contact-settings"),
-      fetchApi("/locations"),
-    ]);
-
-    const [settingsDoc, locationsDocs] = await Promise.all([
-      settingsRes.ok ? settingsRes.json() : null,
-      locationsRes.ok ? locationsRes.json() : [],
-    ]);
-
-    const settings = settingsDoc
-      ? { ...DEFAULT_SETTINGS, ...settingsDoc }
-      : DEFAULT_SETTINGS;
-
-    return { settings, locations: locationsDocs || [] };
-  } catch (error) {
-    console.error("Error fetching contact data:", error);
-    return { settings: DEFAULT_SETTINGS, locations: [] };
-  }
-}
-
 export default async function ContactPage() {
-  const { settings, locations } = await getContactData();
+  const { settings, locations } = await getContactPageData();
 
   // Separate full-listing locations from "Also Available At"
   const mainLocations = locations.filter((loc: any) => !loc.isAvailableAt);

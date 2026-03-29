@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { SectionReveal } from "@/components/shared/SectionReveal";
 import { Card, CardContent } from "@/components/ui/card";
@@ -290,10 +291,12 @@ export default async function TestimonialsPage() {
                     >
                       <div className="relative aspect-video bg-muted">
                         {item.thumbnailUrl ? (
-                          <img
+                          <Image
                             src={item.thumbnailUrl}
                             alt={`Video testimonial from ${item.patientName}`}
-                            className="h-full w-full object-cover transition-opacity duration-200 group-hover:opacity-90"
+                            fill
+                            className="object-cover transition-opacity duration-200 group-hover:opacity-90"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">

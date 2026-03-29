@@ -10,8 +10,11 @@ import { AppointmentCTA } from "@/components/home/AppointmentCTA";
 import { ContactLocationsSection } from "@/components/home/ContactLocationsSection";
 import { FAQSection } from "@/components/home/FAQSection";
 import { MedicalDisclaimer } from "@/components/home/MedicalDisclaimer";
+import { getHomeContactSectionData } from "@/lib/contact-data";
 
-export default function Home() {
+export default async function Home() {
+  const { locations, settings } = await getHomeContactSectionData();
+
   return (
     <>
       <Hero />
@@ -22,7 +25,10 @@ export default function Home() {
       <TestimonialsSection />
       <VideoTestimonialsSection />
       <AppointmentCTA />
-      <ContactLocationsSection />
+      <ContactLocationsSection
+        initialLocations={locations}
+        initialSettings={settings}
+      />
       <SectionReveal>
         <FAQSection />
       </SectionReveal>
