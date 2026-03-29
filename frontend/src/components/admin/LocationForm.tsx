@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { NEXT_PUBLIC_API_URL } from "@/lib/api-client";
+import { browserAdminApiUrl } from "@/lib/api-client";
 
 interface LocationFormProps {
   initialData?: any;
@@ -120,13 +120,13 @@ export function LocationForm({ initialData }: LocationFormProps) {
       };
 
       const url = initialData
-        ? `${NEXT_PUBLIC_API_URL}/admin/locations/${initialData._id}`
-        : `${NEXT_PUBLIC_API_URL}/admin/locations`;
+        ? browserAdminApiUrl(`/admin/locations/${initialData._id}`)
+        : browserAdminApiUrl("/admin/locations");
       const method = initialData ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
-        credentials: "include",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
