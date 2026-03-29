@@ -238,6 +238,8 @@ const WRITTEN = [
   },
 ];
 
+export const revalidate = 120;
+
 export default async function TestimonialsPage() {
   let videos: any[] = [];
   try {

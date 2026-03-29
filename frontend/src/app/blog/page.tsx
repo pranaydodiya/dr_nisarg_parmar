@@ -19,6 +19,8 @@ function formatDate(dateStr: string) {
   });
 }
 
+export const revalidate = 120;
+
 export default async function BlogListPage() {
   let blogs = [];
   try {
