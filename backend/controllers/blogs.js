@@ -18,7 +18,16 @@ export async function getPublicBlogs(req, res) {
 // GET /api/blogs/:slug (Public)
 export async function getPublicBlogBySlug(req, res) {
   try {
-    const { slug } = req.params;
+    const slugParam = req.params?.slug;
+    if (typeof slugParam !== "string") {
+      return res.status(400).json({ error: "Invalid slug" });
+    }
+
+    const slug = slugParam.trim().toLowerCase();
+    if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+      return res.status(400).json({ error: "Invalid slug" });
+    }
+
     const db = getDb();
     const blog = await db.collection("blogs").findOne({ slug, isPublished: true });
 

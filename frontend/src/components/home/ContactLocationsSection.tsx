@@ -90,16 +90,23 @@ export function ContactLocationsSection({
                 <Card
                   className={`border-border rounded-2xl flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 h-full overflow-hidden ${loc.isPrimary ? "ring-2 ring-secondary/30 border-secondary/20" : ""}`}
                 >
-                  {loc.gmapEmbedCode && (
-                    <div
-                      className="w-full bg-muted"
-                      dangerouslySetInnerHTML={{
-                        __html: loc.gmapEmbedCode
-                          .replace(/width="[^"]*"/g, 'width="100%"')
-                          .replace(/height="[^"]*"/g, 'height="180"'),
-                      }}
-                    />
-                  )}
+                  <Card
+                    className={`border-border rounded-2xl flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 h-full overflow-hidden ${loc.isPrimary ? "ring-2 ring-secondary/30 border-secondary/20" : ""}`}
+                  >
+                    {mapEmbedSrc && (
+                      <div className="w-full bg-muted">
+                        <iframe
+                          src={mapEmbedSrc}
+                          title={`${loc.name || "Location"} map`}
+                          width="100%"
+                          height="180"
+                          style={{ border: 0 }}
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                          allowFullScreen
+                        />
+                      </div>
+                    )}
                   <CardContent className="pt-5 pb-5 flex-grow flex flex-col">
                     <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 flex items-center gap-2 flex-wrap">
                       {loc.name}

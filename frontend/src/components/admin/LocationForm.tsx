@@ -37,6 +37,26 @@ function extractCoordsFromEmbed(
   return null;
 }
 
+function getGoogleMapsEmbedSrc(embedCode: string): string | null {
+  const iframeMatch =
+    embedCode.match(/<iframe[^>]*\ssrc="([^"]+)"[^>]*>/i) ||
+    embedCode.match(/<iframe[^>]*\ssrc='([^']+)'[^>]*>/i);
+  const src = iframeMatch?.[1];
+  if (!src) return null;
+
+  try {
+    const url = new URL(src);
+    const isGoogleMapsHost =
+      url.hostname === "google.com" ||
+      url.hostname === "www.google.com" ||
+      url.hostname.endsWith(".google.com");
+    if (!isGoogleMapsHost || !url.pathname.startsWith("/maps")) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
 export function LocationForm({ initialData }: LocationFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -128,6 +148,7 @@ export function LocationForm({ initialData }: LocationFormProps) {
 
   const inputClass =
     "w-full rounded-md border text-black border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900";
+  const mapPreviewSrc = getGoogleMapsEmbedSrc(gmapEmbedCode);
 
   return (
     <form
@@ -235,7 +256,7 @@ export function LocationForm({ initialData }: LocationFormProps) {
         </div>
 
         {/* Live Map Preview */}
-        {gmapEmbedCode && (
+        {mapPreviewSrc && (
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700">
               🗺️ Map Preview
@@ -243,12 +264,18 @@ export function LocationForm({ initialData }: LocationFormProps) {
             <div
               className="w-full rounded-lg overflow-hidden border border-slate-200 bg-slate-50"
               style={{ minHeight: "300px" }}
-              dangerouslySetInnerHTML={{
-                __html: gmapEmbedCode
-                  .replace(/width="[^"]*"/g, 'width="100%"')
-                  .replace(/height="[^"]*"/g, 'height="300"'),
-              }}
-            />
+            >
+              <iframe
+                src={mapPreviewSrc}
+                title="Google Maps preview"
+                width="100%"
+                height="300"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            </div>
           </div>
         )}
 
