@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Youtube, Instagram, UploadCloud } from "lucide-react";
-import { NEXT_PUBLIC_API_URL } from "@/lib/api-client";
+import { browserAdminApiUrl } from "@/lib/api-client";
 
 interface TestimonialFormProps {
   initialData?: any;
@@ -60,13 +60,13 @@ export function TestimonialForm({ initialData }: TestimonialFormProps) {
       if (removeImage) formData.append("removeImage", "true");
 
       const url = initialData
-        ? `${NEXT_PUBLIC_API_URL}/admin/testimonials/${initialData._id}`
-        : `${NEXT_PUBLIC_API_URL}/admin/testimonials`;
+        ? browserAdminApiUrl(`/admin/testimonials/${initialData._id}`)
+        : browserAdminApiUrl("/admin/testimonials");
       const method = initialData ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
-        credentials: "include",
+        credentials: "same-origin",
         body: formData,
       });
 
