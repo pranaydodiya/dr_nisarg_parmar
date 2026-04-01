@@ -5,7 +5,8 @@
 import { SOCIAL_LINKS } from "@/content/site";
 
 export function physicianSameAsUrls(): string[] {
-  const urls = [SOCIAL_LINKS.facebook, SOCIAL_LINKS.instagram];
+  const urls: string[] = [];
+  urls.push(SOCIAL_LINKS.facebook, SOCIAL_LINKS.instagram);
   const gmb = process.env.NEXT_PUBLIC_GOOGLE_BUSINESS_URL?.trim();
   if (gmb) urls.push(gmb);
   return urls;
