@@ -1,12 +1,17 @@
 import { SignJWT, jwtVerify } from "jose";
 
 if (!process.env.JWT_SECRET) {
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("JWT_SECRET is not set. Please configure it in the environment.");
-  }
+  throw new Error(
+    "JWT_SECRET environment variable is required. " +
+    "Set a strong random string (min 32 chars) in your .env file."
+  );
 }
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "dev-secret-change-in-production-min-32-chars");
+if (process.env.JWT_SECRET.length < 32) {
+  throw new Error("JWT_SECRET must be at least 32 characters long.");
+}
+
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 export const COOKIE_NAME = "admin_token";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 

@@ -1,15 +1,12 @@
 import bcrypt from "bcryptjs";
 import { getDb } from "../db.js";
 import { signToken, verifyToken, getCookieOptions, COOKIE_NAME } from "../utils/auth-jwt.js";
+import { logger } from "../utils/logger.js";
 
 // POST /api/auth/login
 export async function login(req, res) {
   try {
     const { email, password } = req.body;
-    
-    if (!email || !password) {
-      return res.status(400).json({ error: "Invalid email or password" });
-    }
 
     const db = getDb();
     const user = await db.collection("users").findOne({
@@ -36,7 +33,7 @@ export async function login(req, res) {
     res.cookie(COOKIE_NAME, token, getCookieOptions());
     return res.json({ success: true });
   } catch (err) {
-    console.error("[auth/login]", err);
+    logger.error({ err }, "auth login failed");
     return res.status(500).json({ error: "Something went wrong" });
   }
 }

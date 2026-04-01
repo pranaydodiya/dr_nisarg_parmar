@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed:admin": "node scripts/seed-admin.mjs"
+    "seed:admin": "npm run seed:admin --prefix ../backend"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

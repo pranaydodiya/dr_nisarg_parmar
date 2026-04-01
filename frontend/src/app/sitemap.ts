@@ -1,33 +1,48 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 import { fetchApi } from "@/lib/api-client";
+import { getSiteUrl } from "@/lib/seo";
+
+type ChangeFreq = MetadataRoute.Sitemap[0]["changeFrequency"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://drnisargparmar.com";
+  const baseUrl = getSiteUrl();
 
-  // Define static routes
-  const staticRoutes = ["", "/about", "/contact", "/testimonials", "/blog"].map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: new Date().toISOString(),
-    changeFrequency: (route === "" || route === "/blog") ? "weekly" : "monthly" as any,
-    priority: route === "" ? 1 : 0.8,
+  const staticEntries: { path: string; changeFrequency: ChangeFreq; priority: number }[] = [
+    { path: "", changeFrequency: "weekly", priority: 1 },
+    { path: "/about", changeFrequency: "monthly", priority: 0.85 },
+    { path: "/contact", changeFrequency: "monthly", priority: 0.9 },
+    { path: "/testimonials", changeFrequency: "weekly", priority: 0.85 },
+    { path: "/blog", changeFrequency: "weekly", priority: 0.9 },
+    { path: "/specialties", changeFrequency: "monthly", priority: 0.9 },
+    { path: "/appointments", changeFrequency: "monthly", priority: 0.85 },
+  ];
+
+  const staticRoutes: MetadataRoute.Sitemap = staticEntries.map(({ path, changeFrequency, priority }) => ({
+    url: path === "" ? baseUrl : `${baseUrl}${path}`,
+    lastModified: new Date(),
+    changeFrequency,
+    priority,
   }));
 
-  // Fetch dynamic blog routes
-  let dynamicRoutes: any[] = [];
+  let blogRoutes: MetadataRoute.Sitemap = [];
   try {
     const res = await fetchApi("/blogs");
     if (res.ok) {
       const blogs = await res.json();
-      dynamicRoutes = blogs.map((post: any) => ({
+      blogRoutes = (blogs as { slug: string; updatedAt?: string; createdAt?: string }[]).map((post) => ({
         url: `${baseUrl}/blog/${post.slug}`,
-        lastModified: post.updatedAt ? new Date(post.updatedAt).toISOString() : new Date().toISOString(),
-        changeFrequency: "monthly" as any,
-        priority: 0.6,
+        lastModified: post.updatedAt
+          ? new Date(post.updatedAt)
+          : post.createdAt
+            ? new Date(post.createdAt)
+            : new Date(),
+        changeFrequency: "monthly" as ChangeFreq,
+        priority: 0.65,
       }));
     }
-  } catch (err) {
-    console.error("Failed to fetch blogs for sitemap:", err);
+  } catch {
+    /* sitemap still valid without dynamic posts */
   }
 
-  return [...staticRoutes, ...dynamicRoutes];
+  return [...staticRoutes, ...blogRoutes];
 }

@@ -1,7 +1,12 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { EMERGENCY_PHONE_TEL } from "@/content/site";
-import { ChatWidget } from "./ChatWidget";
+
+const ChatWidget = dynamic(() => import("./ChatWidget").then((m) => m.ChatWidget), {
+  ssr: false,
+  loading: () => null,
+});
 
 export function FloatingWidgets() {
   return (

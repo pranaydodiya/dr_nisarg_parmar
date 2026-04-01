@@ -2,10 +2,31 @@ import multer from 'multer';
 import { ObjectId } from 'mongodb';
 import { getDb } from '../db.js';
 import { uploadImage, deleteImage } from '../utils/cloudinary.js';
+import { stripHtml } from '../utils/sanitize.js';
+<<<<<<< Current (Your changes)
+=======
+import { logger } from '../utils/logger.js';
+>>>>>>> Incoming (Background Agent changes)
 
-// Setup basic memory storage for multer
+const ALLOWED_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+]);
+
 const storage = multer.memoryStorage();
-export const upload = multer({ storage });
+export const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB
+    files: 1,
+  },
+  fileFilter(_req, file, cb) {
+    if (ALLOWED_MIME_TYPES.has(file.mimetype)) return cb(null, true);
+    cb(new Error("Only JPEG, PNG, WebP, and GIF images are allowed."));
+  },
+});
 
 function extractYouTubeId(url) {
   const regExp = /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i;
@@ -21,7 +42,7 @@ export async function getPublicTestimonials(req, res) {
     const testimonials = await testimonialsCollection.find({ isPublished: true }).sort({ createdAt: -1 }).toArray();
     return res.json(testimonials);
   } catch (error) {
-    console.error("Error fetching public testimonials:", error);
+    logger.error({ err: error }, "error fetching public testimonials");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -34,7 +55,7 @@ export async function getTestimonials(req, res) {
     const testimonials = await testimonialsCollection.find({}).sort({ createdAt: -1 }).toArray();
     return res.json(testimonials);
   } catch (error) {
-    console.error("Error fetching testimonials:", error);
+    logger.error({ err: error }, "error fetching admin testimonials");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -42,14 +63,9 @@ export async function getTestimonials(req, res) {
 // POST /api/admin/testimonials
 export async function createTestimonial(req, res) {
   try {
-    const { patientName, condition, summary, videoUrl, platform = 'youtube', isPublished } = req.body;
-    
-    // multer provides req.file if 'thumbnail' was uploaded
-    const file = req.file; 
+    const { patientName, condition, summary, videoUrl, platform, isPublished } = req.body;
 
-    if (!patientName || !videoUrl) {
-      return res.status(400).json({ error: "Patient Name and Video URL are required" });
-    }
+    const file = req.file;
 
     let thumbnailUrl = "";
     let thumbnailId = "";
@@ -69,14 +85,14 @@ export async function createTestimonial(req, res) {
     }
 
     const newTestimonial = {
-      patientName,
-      condition: condition || "",
-      summary: summary || "",
+      patientName: stripHtml(patientName),
+      condition: stripHtml(condition || ""),
+      summary: stripHtml(summary || ""),
       videoUrl,
       platform,
       thumbnailUrl,
       thumbnailId,
-      isPublished: isPublished === "true" || isPublished === true,
+      isPublished,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -86,7 +102,7 @@ export async function createTestimonial(req, res) {
 
     return res.status(201).json({ ...newTestimonial, _id: result.insertedId });
   } catch (error) {
-    console.error("Error creating testimonial:", error);
+    logger.error({ err: error }, "error creating testimonial");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -103,7 +119,7 @@ export async function getTestimonial(req, res) {
     if (!testimonial) return res.status(404).json({ error: "Testimonial not found" });
     return res.json(testimonial);
   } catch (error) {
-    console.error("Error fetching testimonial:", error);
+    logger.error({ err: error }, "error fetching testimonial");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -114,12 +130,8 @@ export async function updateTestimonial(req, res) {
     const { id } = req.params;
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: "Invalid ID" });
 
-    const { patientName, condition, summary, videoUrl, platform = 'youtube', isPublished, removeImage } = req.body;
+    const { patientName, condition, summary, videoUrl, platform, isPublished, removeImage } = req.body;
     const file = req.file;
-
-    if (!patientName || !videoUrl) {
-      return res.status(400).json({ error: "Patient Name and Video URL are required" });
-    }
 
     const db = getDb();
     const collection = db.collection("testimonials");
@@ -134,7 +146,7 @@ export async function updateTestimonial(req, res) {
     const isPlatformChanged = existingDoc.platform !== platform;
 
     // Remove old image if requested, overwritten, or platform changed away from instagram
-    if (file || removeImage === "true" || removeImage === true || (isPlatformChanged && existingDoc.platform === "instagram")) {
+    if (file || removeImage || (isPlatformChanged && existingDoc.platform === "instagram")) {
       if (thumbnailId) {
         await deleteImage(thumbnailId);
         thumbnailUrl = "";
@@ -158,14 +170,14 @@ export async function updateTestimonial(req, res) {
 
     const updateDoc = {
       $set: {
-        patientName,
-        condition: condition || "",
-        summary: summary || "",
+        patientName: stripHtml(patientName),
+        condition: stripHtml(condition || ""),
+        summary: stripHtml(summary || ""),
         videoUrl,
         platform,
         thumbnailUrl,
         thumbnailId,
-        isPublished: isPublished === "true" || isPublished === true,
+        isPublished,
         updatedAt: new Date(),
       },
     };
@@ -175,7 +187,7 @@ export async function updateTestimonial(req, res) {
 
     return res.json(updatedTestimonial);
   } catch (error) {
-    console.error("Error updating testimonial:", error);
+    logger.error({ err: error }, "error updating testimonial");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -199,7 +211,7 @@ export async function deleteTestimonial(req, res) {
     await collection.deleteOne({ _id: new ObjectId(id) });
     return res.json({ success: true, message: "Testimonial deleted successfully" });
   } catch (error) {
-    console.error("Error deleting testimonial:", error);
+    logger.error({ err: error }, "error deleting testimonial");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }

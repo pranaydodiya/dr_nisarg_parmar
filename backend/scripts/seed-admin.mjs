@@ -1,11 +1,17 @@
 /**
  * One-time seed: create admin user in MongoDB.
- * Run: npm run seed:admin
- * Requires: MONGODB_URI and SEED_ADMIN_PASSWORD in .env; optional SEED_ADMIN_EMAIL, SEED_ADMIN_NAME
+ * Run from repo root: npm run seed:admin --prefix backend
+ * Requires: MONGODB_URI and SEED_ADMIN_PASSWORD in backend/.env; optional SEED_ADMIN_EMAIL, SEED_ADMIN_NAME
  */
-import "dotenv/config";
+import path from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 import bcrypt from "bcryptjs";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, "..", ".env") });
+
 const { hashSync } = bcrypt;
 
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -14,12 +20,12 @@ const PASSWORD = process.env.SEED_ADMIN_PASSWORD;
 const NAME = process.env.SEED_ADMIN_NAME || "Admin";
 
 if (!MONGODB_URI) {
-  console.error("Missing MONGODB_URI in .env");
+  console.error("Missing MONGODB_URI in backend/.env");
   process.exit(1);
 }
 
 if (!PASSWORD) {
-  console.error("Missing SEED_ADMIN_PASSWORD in .env");
+  console.error("Missing SEED_ADMIN_PASSWORD in backend/.env");
   process.exit(1);
 }
 

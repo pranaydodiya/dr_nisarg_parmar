@@ -4,12 +4,15 @@ import Image from "next/image";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { Card, CardContent } from "@/components/ui/card";
 import { fetchApi } from "@/lib/api-client";
+import { buildPageMetadata, SITE_NAME } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Blog | Dr. Nisarg Parmar - Neurosurgeon",
+export const metadata: Metadata = buildPageMetadata({
+  path: "/blog",
+  title: `Blog | ${SITE_NAME}`,
   description:
     "Articles on brain and spine care, neurosurgery, and patient information from Dr. Nisarg Parmar.",
-};
+  keywords: ["neurosurgery articles", "spine health blog", "brain health India"],
+});
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-IN", {
