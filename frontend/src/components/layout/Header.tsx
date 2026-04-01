@@ -12,6 +12,8 @@ import { EMERGENCY_PHONE, EMERGENCY_PHONE_TEL } from "@/content/site";
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About Us" },
+  { href: "/neurosurgeon-in-surat", label: "Surat" },
+  { href: "/neurosurgeon-in-ahmedabad", label: "Ahmedabad" },
   { href: "/specialties", label: "Specialties" },
   { href: "/testimonials", label: "Testimonials" },
   { href: "/blog", label: "Blog" },

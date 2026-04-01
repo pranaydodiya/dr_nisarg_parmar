@@ -6,7 +6,29 @@ import { Button } from "@/components/ui/button";
 import { fetchApi } from "@/lib/api-client";
 import { sanitizeRichHtml } from "@/lib/sanitize";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { physicianSameAsUrls, LOCAL_KEYWORDS_PRIMARY } from "@/content/local-seo";
 import { buildPageMetadata, getSiteUrl, SITE_NAME } from "@/lib/seo";
+
+function tagsToKeywords(post: Record<string, unknown>): string[] {
+  const raw = post.tags;
+  if (Array.isArray(raw)) {
+    return raw.filter((t): t is string => typeof t === "string").slice(0, 14);
+  }
+  if (typeof raw === "string") {
+    return raw
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean)
+      .slice(0, 14);
+  }
+  return [];
+}
+
+function approximateWordCount(html: string): number {
+  const text = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  if (!text) return 0;
+  return text.split(" ").length;
+}
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -45,16 +67,32 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const createdAt = typeof post.createdAt === "string" ? post.createdAt : undefined;
   const updatedAt = typeof post.updatedAt === "string" ? post.updatedAt : createdAt;
 
-  return buildPageMetadata({
+  const tagKw = tagsToKeywords(post);
+  const baseMeta = buildPageMetadata({
     path: `/blog/${slug}`,
-    title: `${post.title} | Blog`,
-    description: excerpt || `${post.title} — neurosurgery and spine care insights from ${SITE_NAME}.`,
+    title: `${post.title} | Neurosurgery Blog | ${SITE_NAME}`,
+    description: excerpt || `${post.title} — neurosurgery and spine care insights from ${SITE_NAME} in Surat & Ahmedabad, Gujarat.`,
     imageUrl: featuredImage,
     ogType: "article",
     publishedTime: createdAt,
     modifiedTime: updatedAt,
-    keywords: ["neurosurgery blog", "spine health", "brain health", "Gujarat neurosurgeon"],
+    keywords: [
+      ...tagKw,
+      "neurosurgery blog Gujarat",
+      "brain and spine",
+      ...LOCAL_KEYWORDS_PRIMARY.slice(0, 5),
+    ],
   });
+
+  return {
+    ...baseMeta,
+    alternates: {
+      ...baseMeta.alternates,
+      types: {
+        "application/rss+xml": `${getSiteUrl()}/feed.xml`,
+      },
+    },
+  };
 }
 
 export default async function BlogPostPage({ params }: Props) {
@@ -71,9 +109,8 @@ export default async function BlogPostPage({ params }: Props) {
 
   if (!post || typeof post.title !== "string") notFound();
 
-  const body = sanitizeRichHtml(
-    typeof post.content === "string" ? post.content : "<p>Content coming soon.</p>",
-  );
+  const rawContent = typeof post.content === "string" ? post.content : "<p>Content coming soon.</p>";
+  const body = sanitizeRichHtml(rawContent);
   const base = getSiteUrl();
   const url = `${base}/blog/${slug}`;
   const title = post.title as string;
@@ -82,18 +119,22 @@ export default async function BlogPostPage({ params }: Props) {
   const createdAt = typeof post.createdAt === "string" ? post.createdAt : new Date().toISOString();
   const updatedAt = typeof post.updatedAt === "string" ? post.updatedAt : createdAt;
   const category = typeof post.category === "string" ? post.category : "Health";
+  const wordCount = approximateWordCount(rawContent);
+  const keywordsJoined = tagsToKeywords(post).join(", ");
 
   const blogPosting = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: title,
-    description: excerpt,
+    description: excerpt || undefined,
     datePublished: createdAt,
     dateModified: updatedAt,
     author: {
       "@type": "Person",
       name: SITE_NAME,
+      jobTitle: "Neurosurgeon",
       url: base,
+      sameAs: physicianSameAsUrls(),
     },
     publisher: {
       "@type": "Organization",
@@ -104,6 +145,8 @@ export default async function BlogPostPage({ params }: Props) {
     url,
     ...(featuredImage && { image: [featuredImage] }),
     articleSection: category,
+    ...(wordCount > 0 && { wordCount }),
+    ...(keywordsJoined && { keywords: keywordsJoined }),
   };
 
   const breadcrumbs = {

@@ -10,11 +10,9 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "db:indexes": "node scripts/create-indexes.mjs",
-<<<<<<< Current (Your changes)
-=======
     "seed:admin": "node scripts/seed-admin.mjs",
->>>>>>> Incoming (Background Agent changes)
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test test/",
+    "test:integration": "node --test test/api.integration.test.mjs"
   },
   "keywords": [],
   "author": "",
@@ -38,6 +36,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "supertest": "^7.1.4"
   }
 }
