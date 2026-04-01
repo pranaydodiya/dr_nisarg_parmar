@@ -1,0 +1,19 @@
+# Dr. Nisarg Parmar — neurosurgeon (Surat & Ahmedabad, Gujarat)
+
+Official practice information: NIMHANS-trained neurosurgeon; brain and spine surgery; emergency neurosurgery.
+
+## How to crawl
+Use the site’s canonical domain from the live deployment. Key paths:
+- / — Home
+- /neurosurgeon-in-surat — Neurosurgeon in Surat, Gujarat
+- /neurosurgeon-in-ahmedabad — Neurosurgeon in Ahmedabad
+- /about — Credentials and background
+- /specialties — Clinical specialties
+- /contact — Locations and contact
+- /appointments — Booking
+- /blog — Patient-facing articles
+- /sitemap.xml — All indexable URLs
+- /feed.xml — RSS feed for the blog
+
+## Medical disclaimer
+Web content is educational; it is not a substitute for in-person medical advice or emergency care.

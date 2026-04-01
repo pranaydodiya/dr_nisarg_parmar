@@ -4,6 +4,7 @@ import "@/app/globals.css";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ClientLayout } from "@/components/layout/ClientLayout";
 import { FloatingWidgets } from "@/components/shared/FloatingWidgets";
+import { SiteAnalytics } from "@/components/analytics/SiteAnalytics";
 import { getSiteUrl, SITE_NAME, defaultOgImage } from "@/lib/seo";
 
 const inter = Inter({
@@ -26,17 +27,20 @@ const rootDesc =
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: `${SITE_NAME} | Neurosurgeon | Brain & Spine Specialist`,
+    default: `Neurosurgeon in Surat & Ahmedabad | ${SITE_NAME} | Brain & Spine`,
     template: `%s | ${SITE_NAME}`,
   },
   description: rootDesc,
   keywords: [
     "neurosurgeon Surat",
+    "best neurosurgeon Surat",
     "neurosurgeon Ahmedabad",
-    "brain surgery Gujarat",
-    "spine surgery",
+    "brain surgeon Gujarat",
+    "spine surgeon Gujarat",
+    "top neurosurgeon Gujarat",
     "NIMHANS neurosurgeon",
     "Dr Nisarg Parmar",
+    "brain and spine specialist",
   ],
   authors: [{ name: "Dr. Nisarg Parmar" }],
   creator: "Dr. Nisarg Parmar",
@@ -45,7 +49,7 @@ export const metadata: Metadata = {
     locale: "en_IN",
     url: getSiteUrl(),
     siteName: SITE_NAME,
-    title: `${SITE_NAME} | Neurosurgeon | Brain & Spine Specialist`,
+    title: `Neurosurgeon in Surat & Ahmedabad | ${SITE_NAME}`,
     description: rootDesc,
     ...(defaultOgImage() && {
       images: [{ url: defaultOgImage()!, width: 1200, height: 630, alt: SITE_NAME }],
@@ -71,6 +75,7 @@ export default function RootLayout({
         <ScrollToTop />
         <FloatingWidgets />
         <ClientLayout>{children}</ClientLayout>
+        <SiteAnalytics />
       </body>
     </html>
   );

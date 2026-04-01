@@ -104,6 +104,16 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link prefetch href="/neurosurgeon-in-surat" className="text-primary-foreground/90 hover:text-primary-foreground text-sm focus-visible:ring-2 ring-primary-foreground ring-offset-2 ring-offset-primary rounded">
+                  Neurosurgeon in Surat
+                </Link>
+              </li>
+              <li>
+                <Link prefetch href="/neurosurgeon-in-ahmedabad" className="text-primary-foreground/90 hover:text-primary-foreground text-sm focus-visible:ring-2 ring-primary-foreground ring-offset-2 ring-offset-primary rounded">
+                  Neurosurgeon in Ahmedabad
+                </Link>
+              </li>
+              <li>
                 <Link prefetch href="/blog" className="text-primary-foreground/90 hover:text-primary-foreground text-sm focus-visible:ring-2 ring-primary-foreground ring-offset-2 ring-offset-primary rounded">
                   Blog
                 </Link>
@@ -154,6 +164,15 @@ export function Footer() {
             </h3>
             <p className="text-primary-foreground/80 text-sm">
               The information provided on this website is for educational purposes only and should not be considered as medical advice. Always consult a qualified healthcare provider for proper diagnosis and treatment.
+            </p>
+            <p className="text-primary-foreground/90 text-sm mt-3">
+              <Link
+                prefetch
+                href="/privacy"
+                className="underline underline-offset-2 hover:text-primary-foreground focus-visible:ring-2 ring-primary-foreground rounded"
+              >
+                Privacy &amp; cookies
+              </Link>
             </p>
             <p className="text-primary-foreground/80 text-sm mt-4">
               © {currentYear} Dr. Nisarg Parmar. All rights reserved.

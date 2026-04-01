@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SectionReveal } from "@/components/shared/SectionReveal";
 import { Hero } from "@/components/home/Hero";
 import { TrustIndicators } from "@/components/home/TrustIndicators";
@@ -9,6 +10,7 @@ import { SpecialtiesSection } from "@/components/home/SpecialtiesSection";
 import { getHomeContactSectionData } from "@/lib/contact-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { FAQ_ITEMS } from "@/content/faq";
+import { physicianSameAsUrls, LOCAL_KEYWORDS_PRIMARY } from "@/content/local-seo";
 import { buildPageMetadata, getSiteUrl, SITE_NAME } from "@/lib/seo";
 
 const TestimonialsSection = dynamic(() =>
@@ -35,13 +37,13 @@ const homeDesc =
 
 export const metadata: Metadata = buildPageMetadata({
   path: "/",
-  title: `${SITE_NAME} | Neurosurgeon | Brain & Spine Specialist`,
+  title: `Neurosurgeon in Surat & Ahmedabad, Gujarat | ${SITE_NAME} | Brain & Spine Specialist`,
   description: homeDesc,
   keywords: [
-    "neurosurgeon Surat",
-    "spine surgeon Gujarat",
-    "brain tumor surgery",
-    "emergency neurosurgery",
+    ...LOCAL_KEYWORDS_PRIMARY,
+    "brain tumor surgery Surat",
+    "spine surgery Ahmedabad",
+    "emergency neurosurgery Gujarat",
   ],
 });
 
@@ -66,7 +68,14 @@ export default async function Home() {
         "@id": `${base}/#physician`,
         name: "Dr. Nisarg Parmar",
         url: base,
-        medicalSpecialty: ["Neurosurgery"],
+        jobTitle: "Neurosurgeon",
+        medicalSpecialty: ["Neurosurgery", "Neurological Surgery"],
+        sameAs: physicianSameAsUrls(),
+        alumniOf: {
+          "@type": "EducationalOrganization",
+          name: "National Institute of Mental Health and Neurosciences (NIMHANS)",
+          address: { "@type": "PostalAddress", addressLocality: "Bangalore", addressCountry: "IN" },
+        },
         knowsAbout: [
           "Brain tumor surgery",
           "Spine surgery",
@@ -75,8 +84,17 @@ export default async function Home() {
           "Minimally invasive neurosurgery",
         ],
         areaServed: [
-          { "@type": "City", name: "Surat", containedInPlace: { "@type": "Country", name: "India" } },
-          { "@type": "City", name: "Ahmedabad", containedInPlace: { "@type": "Country", name: "India" } },
+          {
+            "@type": "City",
+            name: "Surat",
+            containedInPlace: { "@type": "AdministrativeArea", name: "Gujarat", containedInPlace: { "@type": "Country", name: "India" } },
+          },
+          {
+            "@type": "City",
+            name: "Ahmedabad",
+            containedInPlace: { "@type": "AdministrativeArea", name: "Gujarat", containedInPlace: { "@type": "Country", name: "India" } },
+          },
+          { "@type": "AdministrativeArea", name: "Gujarat", containedInPlace: { "@type": "Country", name: "India" } },
         ],
       },
       {
@@ -100,6 +118,13 @@ export default async function Home() {
       <section className="sr-only" aria-label="Summary for search and assistive tools">
         <h2>Practice overview</h2>
         <p>{homeDesc}</p>
+        <p>
+          <Link href="/neurosurgeon-in-surat">Neurosurgeon in Surat</Link>
+          {" · "}
+          <Link href="/neurosurgeon-in-ahmedabad">Neurosurgeon in Ahmedabad</Link>
+          {" · "}
+          <Link href="/blog">Neurosurgery blog</Link>
+        </p>
       </section>
       <Hero />
       <TrustIndicators />
