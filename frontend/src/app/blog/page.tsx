@@ -31,7 +31,8 @@ export const metadata: Metadata = {
   },
 };
 
-function formatDate(dateStr: string) {
+function formatDate(dateStr: string | undefined) {
+  if (!dateStr?.trim()) return "";
   return new Date(dateStr).toLocaleDateString("en-IN", {
     year: "numeric",
     month: "long",
@@ -78,7 +79,7 @@ export default async function BlogListPage() {
       "@type": "BlogPosting",
       headline: post.title,
       url: `${base}/blog/${post.slug}`,
-      datePublished: post.createdAt,
+      ...(post.createdAt ? { datePublished: post.createdAt } : {}),
     })),
   };
 
@@ -119,7 +120,12 @@ export default async function BlogListPage() {
                 </div>
                 <CardContent className="pt-5 pb-5 flex-1 flex flex-col">
                   <p className="text-xs text-muted-foreground mb-1">
-                    {post.category} • {formatDate(post.createdAt)}
+                    {[
+                      post.category,
+                      formatDate(post.createdAt),
+                    ]
+                      .filter(Boolean)
+                      .join(" • ") || "Article"}
                   </p>
                   <h2 className="text-lg font-semibold text-foreground group-hover:text-secondary transition-colors mb-2">
                     {post.title}
