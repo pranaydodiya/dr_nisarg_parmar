@@ -1,5 +1,6 @@
 import { getDb } from '../db.js';
 import { stripHtml } from '../utils/sanitize.js';
+import { logger } from '../utils/logger.js';
 
 const SETTINGS_KEY = "contact_settings";
 
@@ -34,7 +35,7 @@ export async function getContactSettings(req, res) {
     const { _id, key, updatedAt, ...publicSettings } = settings;
     return res.json(publicSettings);
   } catch (error) {
-    console.error("Error fetching public contact settings:", error);
+    logger.error({ err: error }, "error fetching public contact settings");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -46,7 +47,7 @@ export async function getAdminContactSettings(req, res) {
     const settings = await db.collection("settings").findOne({ key: SETTINGS_KEY });
     return res.json(settings || { ...defaults, key: SETTINGS_KEY });
   } catch (error) {
-    console.error("Error fetching admin contact settings:", error);
+    logger.error({ err: error }, "error fetching admin contact settings");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -71,10 +72,10 @@ export async function updateContactSettings(req, res) {
       email: stripHtml(email || ""),
       emergencyMessage: stripHtml(emergencyMessage || ""),
       emergencyTitle: stripHtml(emergencyTitle || "24/7 Emergency Neurosurgery"),
-      showEmergencyStrip: showEmergencyStrip !== false,
+      showEmergencyStrip,
       whatsappNumber: stripHtml(whatsappNumber || ""),
       whatsappMessage: stripHtml(whatsappMessage || ""),
-      showWhatsapp: showWhatsapp === true,
+      showWhatsapp,
       updatedAt: new Date(),
     };
 
@@ -86,7 +87,7 @@ export async function updateContactSettings(req, res) {
 
     return res.json(updateDoc);
   } catch (error) {
-    console.error("Error updating contact settings:", error);
+    logger.error({ err: error }, "error updating contact settings");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }

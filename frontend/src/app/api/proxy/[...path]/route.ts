@@ -36,6 +36,10 @@ async function proxyRequest(request: Request, pathSegments: string[]) {
     headers.set("content-type", contentType);
   }
 
+  if (method !== "GET" && method !== "HEAD") {
+    headers.set("X-Requested-With", "XMLHttpRequest");
+  }
+
   const init: RequestInit = {
     method,
     headers,

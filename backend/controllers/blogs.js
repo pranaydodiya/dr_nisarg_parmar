@@ -1,6 +1,11 @@
 import { ObjectId } from 'mongodb';
 import { getDb } from '../db.js';
 import { uploadImage, deleteImage } from '../utils/cloudinary.js';
+import { sanitizeRichHtml, stripHtml } from '../utils/sanitize.js';
+<<<<<<< Current (Your changes)
+=======
+import { logger } from '../utils/logger.js';
+>>>>>>> Incoming (Background Agent changes)
 
 // GET /api/blogs (Public)
 export async function getPublicBlogs(req, res) {
@@ -10,7 +15,7 @@ export async function getPublicBlogs(req, res) {
     const blogs = await blogsCollection.find({ isPublished: true }).sort({ createdAt: -1 }).toArray();
     return res.json(blogs);
   } catch (error) {
-    console.error("Error fetching public blogs:", error);
+    logger.error({ err: error }, "error fetching public blogs");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -34,7 +39,7 @@ export async function getPublicBlogBySlug(req, res) {
     if (!blog) return res.status(404).json({ error: "Blog not found" });
     return res.json(blog);
   } catch (error) {
-    console.error("Error fetching public blog by slug:", error);
+    logger.error({ err: error }, "error fetching public blog by slug");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -47,7 +52,7 @@ export async function getBlogs(req, res) {
     const blogs = await blogsCollection.find({}).sort({ createdAt: -1 }).toArray();
     return res.json(blogs);
   } catch (error) {
-    console.error("Error fetching blogs:", error);
+    logger.error({ err: error }, "error fetching admin blogs");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -55,14 +60,10 @@ export async function getBlogs(req, res) {
 // POST /api/admin/blogs
 export async function createBlog(req, res) {
   try {
-    const { title, excerpt, content, category = "Uncategorized", tags: tagsStr, isPublished } = req.body;
+    const { title, excerpt, content, category, tags: tagsRaw, isPublished } = req.body;
     const file = req.file;
 
-    if (!title || !content) {
-      return res.status(400).json({ error: "Title and content are required" });
-    }
-
-    const tags = tagsStr ? tagsStr.split(",").map((t) => t.trim()).filter(Boolean) : [];
+    const tags = tagsRaw ? tagsRaw.split(",").map((t) => t.trim()).filter(Boolean) : [];
 
     let slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
 
@@ -86,13 +87,13 @@ export async function createBlog(req, res) {
     }
 
     const newBlog = {
-      title,
+      title: stripHtml(title),
       slug,
-      excerpt: excerpt || "",
-      content,
-      category,
+      excerpt: stripHtml(excerpt || ""),
+      content: sanitizeRichHtml(content),
+      category: stripHtml(category),
       tags,
-      isPublished: isPublished === "true" || isPublished === true,
+      isPublished,
       featuredImage,
       imageId,
       createdAt: new Date(),
@@ -102,7 +103,7 @@ export async function createBlog(req, res) {
     const result = await blogsCollection.insertOne(newBlog);
     return res.status(201).json({ ...newBlog, _id: result.insertedId });
   } catch (error) {
-    console.error("Error creating blog:", error);
+    logger.error({ err: error }, "error creating blog");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -119,7 +120,7 @@ export async function getBlog(req, res) {
     if (!blog) return res.status(404).json({ error: "Blog not found" });
     return res.json(blog);
   } catch (error) {
-    console.error("Error fetching blog:", error);
+    logger.error({ err: error }, "error fetching blog");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -130,14 +131,10 @@ export async function updateBlog(req, res) {
     const { id } = req.params;
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: "Invalid ID" });
 
-    const { title, excerpt, content, category = "Uncategorized", tags: tagsStr, isPublished, removeImage } = req.body;
+    const { title, excerpt, content, category, tags: tagsRaw, isPublished, removeImage } = req.body;
     const file = req.file;
 
-    if (!title || !content) {
-      return res.status(400).json({ error: "Title and content are required" });
-    }
-
-    const tags = tagsStr ? tagsStr.split(",").map((t) => t.trim()).filter(Boolean) : [];
+    const tags = tagsRaw ? tagsRaw.split(",").map((t) => t.trim()).filter(Boolean) : [];
 
     const db = getDb();
     const blogsCollection = db.collection("blogs");
@@ -160,7 +157,7 @@ export async function updateBlog(req, res) {
     let featuredImage = existingBlog.featuredImage;
     let imageId = existingBlog.imageId;
 
-    if (file || removeImage === "true" || removeImage === true) {
+    if (file || removeImage) {
       if (existingBlog.imageId) {
          await deleteImage(existingBlog.imageId);
          featuredImage = "";
@@ -176,13 +173,13 @@ export async function updateBlog(req, res) {
 
     const updateDoc = {
       $set: {
-        title,
+        title: stripHtml(title),
         slug,
-        excerpt: excerpt || "",
-        content,
-        category,
+        excerpt: stripHtml(excerpt || ""),
+        content: sanitizeRichHtml(content),
+        category: stripHtml(category),
         tags,
-        isPublished: isPublished === "true" || isPublished === true,
+        isPublished,
         featuredImage,
         imageId,
         updatedAt: new Date(),
@@ -194,7 +191,7 @@ export async function updateBlog(req, res) {
 
     return res.json(updatedBlog);
   } catch (error) {
-    console.error("Error updating blog:", error);
+    logger.error({ err: error }, "error updating blog");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -218,7 +215,7 @@ export async function deleteBlog(req, res) {
     await blogsCollection.deleteOne({ _id: new ObjectId(id) });
     return res.json({ success: true, message: "Blog deleted successfully" });
   } catch (error) {
-    console.error("Error deleting blog:", error);
+    logger.error({ err: error }, "error deleting blog");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }

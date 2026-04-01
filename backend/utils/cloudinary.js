@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
+import { logger } from "./logger.js";
 
 dotenv.config();
 
@@ -41,6 +42,6 @@ export async function deleteImage(publicId) {
       await cloudinary.uploader.destroy(publicId);
     }
   } catch (error) {
-    console.error("Failed to delete image from Cloudinary:", error);
+    logger.error({ err: error }, "failed to delete image from Cloudinary");
   }
 }

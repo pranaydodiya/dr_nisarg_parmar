@@ -13,22 +13,39 @@ import {
 } from "lucide-react";
 import { getContactPageData } from "@/lib/contact-data";
 import { safeJsonLd, sanitizeGmapEmbed } from "@/lib/sanitize";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildPageMetadata, getSiteUrl, SITE_NAME } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Contact & Locations | Dr. Nisarg Parmar",
-  description:
-    "Reach out for appointments, inquiries, or emergency consultations. Locations in Surat and Ahmedabad. 24/7 emergency neurosurgery.",
-};
+const contactDesc =
+  "Reach out for appointments, inquiries, or emergency consultations. Locations in Surat and Ahmedabad. 24/7 emergency neurosurgery.";
+
+export const metadata: Metadata = buildPageMetadata({
+  path: "/contact",
+  title: `Contact & Locations | ${SITE_NAME}`,
+  description: contactDesc,
+  keywords: ["neurosurgeon contact Surat", "neurosurgery clinic Ahmedabad", "emergency neurosurgery Gujarat"],
+});
 
 export default async function ContactPage() {
   const { settings, locations } = await getContactPageData();
+  const base = getSiteUrl();
 
   // Separate full-listing locations from "Also Available At"
   const mainLocations = locations.filter((loc: any) => !loc.isAvailableAt);
   const alsoAvailableAt = locations.filter((loc: any) => loc.isAvailableAt);
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: base },
+      { "@type": "ListItem", position: 2, name: "Contact", item: `${base}/contact` },
+    ],
+  };
+
   return (
     <div className="pt-10 pb-20 md:pt-16 md:pb-24">
+      <JsonLd data={breadcrumbLd} />
       <div className="container mx-auto px-4">
         <SectionHeading
           title="Contact & Locations"

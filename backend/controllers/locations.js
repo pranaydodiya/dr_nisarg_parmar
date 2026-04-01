@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { getDb } from "../db.js";
 import { sanitizeGmapEmbed, stripHtml } from "../utils/sanitize.js";
+import { logger } from "../utils/logger.js";
 
 const PUBLIC_LOCATION_FIELDS = {
   name: 1,
@@ -40,7 +41,7 @@ export async function getLocations(req, res) {
 
     return res.json(sanitized);
   } catch (error) {
-    console.error("Error fetching public locations:", error);
+    logger.error({ err: error }, "error fetching public locations");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -57,7 +58,7 @@ export async function getAdminLocations(req, res) {
 
     return res.json(locations);
   } catch (error) {
-    console.error("Error fetching locations:", error);
+    logger.error({ err: error }, "error fetching admin locations");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -69,10 +70,6 @@ export async function createLocation(req, res) {
       name, address, city, phone, email, gmapEmbedCode, gmapLink,
       latitude, longitude, isPrimary, isAvailableAt, operatingHours, isActive,
     } = req.body;
-
-    if (!name || !address) {
-      return res.status(400).json({ error: "Name and address are required" });
-    }
 
     const db = getDb();
     const locationsCollection = db.collection("locations");
@@ -88,12 +85,12 @@ export async function createLocation(req, res) {
       email: stripHtml(email || ""),
       gmapEmbedCode: sanitizeGmapEmbed(gmapEmbedCode || ""),
       gmapLink: stripHtml(gmapLink || ""),
-      latitude: latitude ? parseFloat(latitude) : null,
-      longitude: longitude ? parseFloat(longitude) : null,
-      isPrimary: isPrimary === true,
-      isAvailableAt: isAvailableAt === true,
+      latitude: latitude ?? null,
+      longitude: longitude ?? null,
+      isPrimary,
+      isAvailableAt,
       operatingHours: stripHtml(operatingHours || ""),
-      isActive: isActive !== false,
+      isActive,
       order: nextOrder,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -102,7 +99,7 @@ export async function createLocation(req, res) {
     const result = await locationsCollection.insertOne(newLocation);
     return res.status(201).json({ ...newLocation, _id: result.insertedId });
   } catch (error) {
-    console.error("Error creating location:", error);
+    logger.error({ err: error }, "error creating location");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -119,7 +116,7 @@ export async function getLocation(req, res) {
     if (!location) return res.status(404).json({ error: "Location not found" });
     return res.json(location);
   } catch (error) {
-    console.error("Error fetching location:", error);
+    logger.error({ err: error }, "error fetching location");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -128,16 +125,6 @@ export async function getLocation(req, res) {
 export async function reorderLocations(req, res) {
   try {
     const { orderedIds } = req.body;
-
-    if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
-      return res.status(400).json({ error: "orderedIds array is required" });
-    }
-
-    for (const id of orderedIds) {
-      if (typeof id !== "string" || !ObjectId.isValid(id)) {
-        return res.status(400).json({ error: "Invalid location ID in orderedIds" });
-      }
-    }
 
     const db = getDb();
     const locationsCollection = db.collection("locations");
@@ -152,7 +139,7 @@ export async function reorderLocations(req, res) {
     await locationsCollection.bulkWrite(bulkOps);
     return res.json({ success: true, message: "Order updated" });
   } catch (error) {
-    console.error("Error reordering locations:", error);
+    logger.error({ err: error }, "error reordering locations");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -168,17 +155,13 @@ export async function updateLocation(req, res) {
       latitude, longitude, isPrimary, isAvailableAt, operatingHours, isActive,
     } = req.body;
 
-    if (!name || !address) {
-      return res.status(400).json({ error: "Name and address are required" });
-    }
-
     const db = getDb();
     const locationsCollection = db.collection("locations");
 
     const existing = await locationsCollection.findOne({ _id: new ObjectId(id) });
     if (!existing) return res.status(404).json({ error: "Location not found" });
 
-    if (isPrimary === true && !existing.isPrimary) {
+    if (isPrimary && !existing.isPrimary) {
       await locationsCollection.updateMany(
         { isPrimary: true, _id: { $ne: new ObjectId(id) } },
         { $set: { isPrimary: false } },
@@ -194,12 +177,12 @@ export async function updateLocation(req, res) {
         email: stripHtml(email || ""),
         gmapEmbedCode: sanitizeGmapEmbed(gmapEmbedCode || ""),
         gmapLink: stripHtml(gmapLink || ""),
-        latitude: latitude ? parseFloat(latitude) : null,
-        longitude: longitude ? parseFloat(longitude) : null,
-        isPrimary: isPrimary === true,
-        isAvailableAt: isAvailableAt === true,
+        latitude: latitude ?? null,
+        longitude: longitude ?? null,
+        isPrimary,
+        isAvailableAt,
         operatingHours: stripHtml(operatingHours || ""),
-        isActive: isActive !== false,
+        isActive,
         updatedAt: new Date(),
       },
     };
@@ -209,7 +192,7 @@ export async function updateLocation(req, res) {
 
     return res.json(updated);
   } catch (error) {
-    console.error("Error updating location:", error);
+    logger.error({ err: error }, "error updating location");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -229,7 +212,7 @@ export async function deleteLocation(req, res) {
     await locationsCollection.deleteOne({ _id: new ObjectId(id) });
     return res.json({ success: true, message: "Location deleted successfully" });
   } catch (error) {
-    console.error("Error deleting location:", error);
+    logger.error({ err: error }, "error deleting location");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }

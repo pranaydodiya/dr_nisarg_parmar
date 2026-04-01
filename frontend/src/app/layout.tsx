@@ -4,6 +4,7 @@ import "@/app/globals.css";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ClientLayout } from "@/components/layout/ClientLayout";
 import { FloatingWidgets } from "@/components/shared/FloatingWidgets";
+import { getSiteUrl, SITE_NAME, defaultOgImage } from "@/lib/seo";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,10 +20,44 @@ const playfair = Playfair_Display({
   display: "optional",
 });
 
+const rootDesc =
+  "NIMHANS-trained neurosurgeon in Gujarat. Brain and spine surgery, emergency neurosurgery, and minimally invasive options in Surat and Ahmedabad.";
+
 export const metadata: Metadata = {
-  title: "Dr. Nisarg Parmar - Neurosurgeon | Brain & Spine Specialist",
-  description:
-    "NIMHANS trained Neurosurgeon providing expert neurological care in Gujarat.",
+  metadataBase: new URL(getSiteUrl()),
+  title: {
+    default: `${SITE_NAME} | Neurosurgeon | Brain & Spine Specialist`,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: rootDesc,
+  keywords: [
+    "neurosurgeon Surat",
+    "neurosurgeon Ahmedabad",
+    "brain surgery Gujarat",
+    "spine surgery",
+    "NIMHANS neurosurgeon",
+    "Dr Nisarg Parmar",
+  ],
+  authors: [{ name: "Dr. Nisarg Parmar" }],
+  creator: "Dr. Nisarg Parmar",
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: getSiteUrl(),
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} | Neurosurgeon | Brain & Spine Specialist`,
+    description: rootDesc,
+    ...(defaultOgImage() && {
+      images: [{ url: defaultOgImage()!, width: 1200, height: 630, alt: SITE_NAME }],
+    }),
+  },
+  twitter: {
+    card: defaultOgImage() ? "summary_large_image" : "summary",
+    title: `${SITE_NAME} | Neurosurgeon`,
+    description: rootDesc,
+    ...(defaultOgImage() && { images: [defaultOgImage()!] }),
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({

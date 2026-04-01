@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SectionReveal } from "@/components/shared/SectionReveal";
@@ -8,16 +8,38 @@ import { EMERGENCY_PHONE } from "@/content/site";
 import { PhilosophySection } from "@/components/about/PhilosophySection";
 import { DnaSection } from "@/components/about/DnaSection";
 import { JourneySection } from "@/components/about/JourneySection";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildPageMetadata, getSiteUrl, SITE_NAME } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "About Dr. Nisarg Parmar | Neurosurgeon | Brain & Spine Specialist",
-  description:
-    "NIMHANS-trained neurosurgeon. Full bio, education, achievements, and core values. Expert neurological care in Gujarat.",
-};
+const aboutDesc =
+  "NIMHANS-trained neurosurgeon. Full bio, education, achievements, and core values. Expert neurological care in Gujarat.";
+
+export const metadata: Metadata = buildPageMetadata({
+  path: "/about",
+  title: `About ${SITE_NAME} | Neurosurgeon | Brain & Spine Specialist`,
+  description: aboutDesc,
+  keywords: ["NIMHANS neurosurgeon", "neurosurgeon biography Gujarat"],
+});
 
 export default function AboutPage() {
+  const base = getSiteUrl();
+  const aboutPageLd = {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    name: `About ${SITE_NAME}`,
+    description: aboutDesc,
+    url: `${base}/about`,
+    mainEntity: {
+      "@type": "Physician",
+      name: "Dr. Nisarg Parmar",
+      url: base,
+      medicalSpecialty: "Neurosurgery",
+    },
+  };
+
   return (
     <div className="bg-[#FAFAF8] text-slate-900 overflow-x-clip">
+      <JsonLd data={aboutPageLd} />
 
       {/* HERO */}
       <section className="relative overflow-clip pt-6 pb-4 md:pt-20 md:pb-16">

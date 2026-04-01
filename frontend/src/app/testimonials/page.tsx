@@ -7,12 +7,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Star, Play, Youtube } from "lucide-react";
 import { TestimonialsColumn } from "@/components/ui/testimonials-columns-1";
 import { fetchApi } from "@/lib/api-client";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildPageMetadata, getSiteUrl, SITE_NAME } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Patient Testimonials | Dr. Nisarg Parmar",
-  description:
-    "What patients say about Dr. Nisarg Parmar. Written and video testimonials from neuro and spine surgery patients.",
-};
+const testimonialsDesc =
+  "What patients say about Dr. Nisarg Parmar. Written and video testimonials from neuro and spine surgery patients.";
+
+export const metadata: Metadata = buildPageMetadata({
+  path: "/testimonials",
+  title: `Patient Testimonials | ${SITE_NAME}`,
+  description: testimonialsDesc,
+  keywords: ["neurosurgery reviews", "spine surgery patient stories Gujarat"],
+});
 
 // Mock written testimonials
 const WRITTEN = [
@@ -251,8 +257,36 @@ export default async function TestimonialsPage() {
     console.error("Failed to fetch videos:", err);
   }
 
+  const base = getSiteUrl();
+  const videoGraph =
+    videos.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@graph": videos.map((item: any) => ({
+            "@type": "VideoObject",
+            name: `Testimonial — ${item.patientName}`,
+            description: item.summary || item.condition || "Patient video testimonial",
+            thumbnailUrl: item.thumbnailUrl || undefined,
+            contentUrl: item.videoUrl,
+            embedUrl: item.platform === "youtube" ? item.videoUrl : undefined,
+            uploadDate: item.createdAt || undefined,
+          })),
+        }
+      : null;
+
   return (
     <div className="bg-[#FAFAF8] text-slate-900 pb-16">
+      {videoGraph && <JsonLd data={videoGraph} />}
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: base },
+            { "@type": "ListItem", position: 2, name: "Testimonials", item: `${base}/testimonials` },
+          ],
+        }}
+      />
       {/* Hero / intro */}
       <section className="pt-8 pb-12 md:pt-12 md:pb-16">
         <div className="container mx-auto px-4">
