@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 import { EMERGENCY_PHONE_TEL } from "@/content/site";
 
 const ChatWidget = dynamic(() => import("./ChatWidget").then((m) => m.ChatWidget), {
@@ -9,6 +10,11 @@ const ChatWidget = dynamic(() => import("./ChatWidget").then((m) => m.ChatWidget
 });
 
 export function FloatingWidgets() {
+  const pathname = usePathname();
+
+  // Hide chatbot & WhatsApp on all admin pages
+  if (pathname.startsWith("/admin")) return null;
+
   return (
     <>
       {/* WhatsApp — bottom right */}
